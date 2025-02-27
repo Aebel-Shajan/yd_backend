@@ -75,6 +75,7 @@ unzip_file(
     zip_file_path=latest_kindle_zip,
     output_path=kindle_folder_path
 )
+os.remove(latest_kindle_zip)
 kindle_file_path = (
     kindle_folder_path
     / "Kindle.ReadingInsights"
@@ -110,6 +111,7 @@ unzip_file(
     zip_file_path=latest_google_zip,
     output_path=google_folder_path
 )
+os.remove(latest_google_zip)
 fitbit_folder_path = (
     google_folder_path 
     / "Takeout"
