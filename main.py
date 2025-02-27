@@ -19,6 +19,7 @@ from yd_pipeline.utils import (
 )
 from pathlib import Path
 import os
+import shutil
 from dotenv import load_dotenv
 import zipfile
 import logging
@@ -57,7 +58,7 @@ with open(latest_strong_csv) as csv:
     process_strong_data(csv)
     get_distinct_workouts()
     get_distinct_exercises()
-
+os.remove(latest_strong_csv)
 
 # ETL kindle data
 # Find the most recent Kindle zip file
@@ -84,7 +85,7 @@ kindle_file_path = (
 with open(kindle_file_path) as csv:
     process_kindle_data(csv)
     get_distinct_books()
-    
+shutil.rmtree(kindle_folder_path)
 
 # ETL github data
 # I WILL NOT COMMIT MY GITHUB TOKEN TO GIT.
@@ -119,12 +120,13 @@ process_sleep_data(fitbit_folder_path)
 process_calorie_data(fitbit_folder_path)
 process_steps(fitbit_folder_path)
 process_running(fitbit_folder_path)
+shutil.rmtree(google_folder_path)
 
-
+shutil.rmtree(data_file_path)
 
 # Convert SQLite DB to JSON
-logger.info("Writing sqlite db into jsons...")
-write_db_to_jsons(
-    db_path="./data/output/year_in_data.db",
-    output_path="./data/output"
-)
+# logger.info("Writing sqlite db into jsons...")
+# write_db_to_jsons(
+#     db_path="./data/output/year_in_data.db",
+#     output_path="./data/output"
+# )
