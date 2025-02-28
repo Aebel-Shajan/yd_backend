@@ -26,7 +26,7 @@ config = {
         "process_sleep": True,
         "process_steps": True,
     },
-    "cleanup_unziped_files": True,
+    "cleanup_unziped_files": False,
     "cleanup_ziped_files": False
 }
 
@@ -90,5 +90,17 @@ if __name__ == "__main__":
             )
             df = fitbit_extractor.process_sleep(fitbit_absolute_path)
             df.to_csv(output_data_folder / "fitbit_sleep.csv")
+            if cleanup_unziped_files:
+                shutil.rmtree(fitbit_absolute_path)
+
+        # Steps
+        if fitbit_config["process_steps"]:
+            extract_folder_from_zip(
+                zip_file_path=latest_google_zip,
+                prefix=fitbit_relative_folder + "steps",
+                output_path=input_data_folder
+            )
+            df = fitbit_extractor.process_steps(fitbit_absolute_path)
+            df.to_csv(output_data_folder / "fitbit_steps.csv")
             if cleanup_unziped_files:
                 shutil.rmtree(fitbit_absolute_path)
