@@ -8,7 +8,7 @@ import yd_extractor.fitbit as fitbit_extractor
 import gdown
 import shutil
 
-from yd_pipeline.utils import extract_folder_from_zip, get_latest_file
+from yd_extractor.utils.utils import extract_folder_from_zip, get_latest_file
 
 logging.basicConfig(
     level=logging.INFO, 
