@@ -213,4 +213,33 @@ def extract_folder_from_zip(zip_file_path: Path, prefix: str, output_path: Path)
         for file in folder_files:
             zip_ref.extract(file, output_path)
 
+def extract_specific_files_flat(zip_file_path: Path, prefix: str, output_path: Path):
+    """
+    Extracts specific files which have the same prefix from a ZIP archive and saves 
+    them to the given output directory without preserving their original folder 
+    structure.
 
+    Args:
+        zip_file_path (Path): Path to zip file.
+        prefix (str): Prefix of files we want to extract.
+        output_path (Path): Output directory to save the files to.
+    """
+    # Ensure the output directory exists
+    os.makedirs(output_path, exist_ok=True)
+
+    # Open the ZIP file
+    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+       
+        for file_name in zip_ref.namelist():
+            if file_name.startswith(prefix):
+                # Extract the file to a temp location
+                with zip_ref.open(file_name) as source_file:
+                    # Get only the filename, ignoring directories
+                    file_name = os.path.basename(file_name)
+                    out_file_path = os.path.join(output_path, file_name)
+                    
+                    # Write the extracted file to the output directory
+                    with open(out_file_path, "wb") as output_file:
+                        output_file.write(source_file.read())
+
+    

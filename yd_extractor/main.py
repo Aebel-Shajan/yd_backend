@@ -8,7 +8,7 @@ import yd_extractor.fitbit as fitbit_extractor
 import gdown
 import shutil
 
-from yd_extractor.utils.utils import extract_folder_from_zip, get_latest_file
+from yd_extractor.utils.utils import extract_folder_from_zip, extract_specific_files_flat, get_latest_file
 
 logging.basicConfig(
     level=logging.INFO, 
@@ -26,7 +26,7 @@ config = {
         "process_sleep": True,
         "process_steps": True,
     },
-    "cleanup_unziped_files": False,
+    "cleanup_unziped_files": True,
     "cleanup_ziped_files": False
 }
 
@@ -71,36 +71,41 @@ if __name__ == "__main__":
         
         # Calories
         if fitbit_config["process_calories"]:
-            extract_folder_from_zip(
+            input_folder = (input_data_folder / "calories")
+            extract_specific_files_flat(
                 zip_file_path=latest_google_zip,
                 prefix=fitbit_relative_folder + "calories",
-                output_path=input_data_folder
+                output_path=input_folder
             )
-            df = fitbit_extractor.process_calories(fitbit_absolute_path)
+            df = fitbit_extractor.process_calories(input_folder)
             df.to_csv(output_data_folder / "fitbit_calories.csv")
             if cleanup_unziped_files:
-                shutil.rmtree(fitbit_absolute_path)
+                shutil.rmtree(input_folder)
 
         # Sleep
         if fitbit_config["process_sleep"]:
-            extract_folder_from_zip(
+            input_folder = (input_data_folder / "sleep")
+            extract_specific_files_flat(
                 zip_file_path=latest_google_zip,
                 prefix=fitbit_relative_folder + "sleep",
-                output_path=input_data_folder
+                output_path=input_folder
             )
-            df = fitbit_extractor.process_sleep(fitbit_absolute_path)
+            df = fitbit_extractor.process_sleep(input_folder)
             df.to_csv(output_data_folder / "fitbit_sleep.csv")
             if cleanup_unziped_files:
-                shutil.rmtree(fitbit_absolute_path)
+                shutil.rmtree(input_folder)
 
         # Steps
         if fitbit_config["process_steps"]:
-            extract_folder_from_zip(
+            input_folder = (input_data_folder / "steps")
+            extract_specific_files_flat(
                 zip_file_path=latest_google_zip,
                 prefix=fitbit_relative_folder + "steps",
-                output_path=input_data_folder
+                output_path=input_folder
             )
-            df = fitbit_extractor.process_steps(fitbit_absolute_path)
+            df = fitbit_extractor.process_steps(input_folder)
             df.to_csv(output_data_folder / "fitbit_steps.csv")
             if cleanup_unziped_files:
-                shutil.rmtree(fitbit_absolute_path)
+                shutil.rmtree(input_folder)
+
+    logger.info("Finished extracting data.")
