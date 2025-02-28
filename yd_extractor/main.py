@@ -35,9 +35,10 @@ config = {
     "process_github": False,
     "process_kindle": False,
     "fitbit_config": {
-        "process_calories": True,
-        "process_sleep": True,
-        "process_steps": True,
+        "process_calories": False,
+        "process_sleep": False,
+        "process_steps": False,
+        "process_exercise": True
     },
     "cleanup_unziped_files": True,
     "cleanup_ziped_files": False
@@ -118,6 +119,19 @@ if __name__ == "__main__":
             )
             df = fitbit_extractor.process_steps(input_folder)
             df.to_csv(output_data_folder / "fitbit_steps.csv")
+            if cleanup_unziped_files:
+                shutil.rmtree(input_folder)
+                
+        # Exercise
+        if fitbit_config["process_exercise"]:
+            input_folder = (input_data_folder / "exercise")
+            extract_specific_files_flat(
+                zip_file_path=latest_google_zip,
+                prefix=fitbit_relative_folder + "exercise",
+                output_path=input_folder
+            )
+            df = fitbit_extractor.process_exercise(input_folder)
+            df.to_csv(output_data_folder / "fitbit_exercise.csv")
             if cleanup_unziped_files:
                 shutil.rmtree(input_folder)
 
