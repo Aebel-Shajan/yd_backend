@@ -1,6 +1,7 @@
 import logging
 import os
 from pathlib import Path
+import sys
 
 from dotenv import load_dotenv
 
@@ -8,13 +9,25 @@ import yd_extractor.fitbit as fitbit_extractor
 import gdown
 import shutil
 
+from yd_extractor.utils.colored_logger import ColoredFormatter
 from yd_extractor.utils.utils import extract_folder_from_zip, extract_specific_files_flat, get_latest_file
 
-logging.basicConfig(
-    level=logging.INFO, 
-    format='%(asctime)s -%(levelname)s -on line: %(lineno)d -%(message)s'
-)
-logger = logging.getLogger() 
+
+# Create a logger
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+
+# Create a console handler
+handler = logging.StreamHandler(sys.stdout)
+handler.setLevel(logging.DEBUG)
+
+# Define a formatter with equal-width columns
+formatter = ColoredFormatter('%(asctime)s | %(levelname)-8s | %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+handler.setFormatter(formatter)
+
+# Add the handler to the logger
+logger.addHandler(handler)
+
 
 config = {
     "download_from_drive": False,
