@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 output_path=input_data_folder
             )
             df = fitbit_extractor.process_calories(fitbit_absolute_path)
-            df.to_csv(output_data_folder / "fitbit_calories.csv", index=False)
+            df.to_csv(output_data_folder / "fitbit_calories.csv")
             if cleanup_unziped_files:
                 shutil.rmtree(fitbit_absolute_path)
 
@@ -89,6 +89,6 @@ if __name__ == "__main__":
                 output_path=input_data_folder
             )
             df = fitbit_extractor.process_sleep(fitbit_absolute_path)
-            df.to_csv(output_data_folder / "fitbit_sleep.csv", index=False)
+            df.to_csv(output_data_folder / "fitbit_sleep.csv")
             if cleanup_unziped_files:
                 shutil.rmtree(fitbit_absolute_path)
