@@ -32,9 +32,10 @@ def extract_json_file_data(folder_path: str, file_name_prefix: str, keys_to_keep
         with open(file_path) as file:
             data_list = json.load(file)
             for data in data_list:
-                filtered_data = {key: data[key] for key in keys_to_keep}
+                filtered_data = {key: data[key] for key in keys_to_keep if key in list(data.keys())}
                 if filtered_data.keys() != keys_to_keep:
                     full_data.append(filtered_data)
+            
 
     return pd.DataFrame(full_data)
 
