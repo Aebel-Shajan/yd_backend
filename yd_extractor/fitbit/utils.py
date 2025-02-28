@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 
-from yd_extractor.utils.utils import validate_columns
+from yd_extractor.utils.pandas import validate_columns
 
 
 def extract_json_file_data(folder_path: str, file_name_prefix: str, keys_to_keep: list[str]) -> pd.DataFrame:

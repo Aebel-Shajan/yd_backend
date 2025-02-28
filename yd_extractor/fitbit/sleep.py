@@ -1,6 +1,6 @@
 import pandas as pd
 
-from yd_extractor.utils.utils import validate_columns
+from yd_extractor.utils.pandas import validate_columns
 
 from .utils import extract_json_file_data
 
