@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 import yd_extractor.fitbit as fitbit_extractor
 import yd_extractor.github as github_extractor
+import yd_extractor.kindle as kindle_extractor
 import gdown
 
 from yd_extractor.utils.colored_logger import ColoredFormatter
@@ -34,8 +35,8 @@ config = {
     "cleanup_unziped_files": False,
     "cleanup_ziped_files": False,
     "process_strong": False,
-    "process_github": True,
-    "process_kindle": False,
+    "process_github": False,
+    "process_kindle": True,
     "fitbit_config": {
         "process_calories": False,
         "process_sleep": False,
@@ -133,6 +134,7 @@ if __name__ == "__main__":
             )
             df.to_csv(output_data_folder / "fitbit_exercise.csv", index=False)
         
+    # Github
     if (config["process_github"]): 
         if env_vars["GITHUB_TOKEN"] is None or env_vars["GITHUB_USERNAME"] is None:
             logger.error(
@@ -143,4 +145,17 @@ if __name__ == "__main__":
             github_token=env_vars["GITHUB_TOKEN"]
         )
         df.to_csv(output_data_folder / "repo_contributions.csv", index=False)
+    
+    # Kindle
+    if config["process_kindle"]:
+        latest_zip = get_latest_file(
+            folder_path=input_data_folder,
+            file_name_glob="Kindle*.zip"
+        )
+        df = kindle_extractor.process_reading(
+            inputs_folder=input_data_folder,
+            zip_path=latest_zip,
+            cleanup=config["cleanup_unziped_files"]
+        )
+        df.to_csv(output_data_folder / "reading.csv", index=False)
     logger.info("Finished extracting data.")
