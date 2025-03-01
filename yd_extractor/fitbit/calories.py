@@ -15,19 +15,21 @@ def process_calories(
     """Extract calories from folder then apply some transformations on data."""
     
     # Unzip and extract calories jsons from zip file.
-    calories_folder = input_data_folder / "calories"
+    data_folder = input_data_folder / "calories"
     extract_specific_files_flat(
         zip_file_path=google_zip_path,
         prefix="Takeout/Fitbit/Global Export Data/calories",
-        output_path=calories_folder
+        output_path=data_folder
     )
     df_raw = extract_json_file_data(
-        folder_path=calories_folder,
+        folder_path=data_folder,
         file_name_prefix="calories",
         keys_to_keep=["dateTime", "value"]
     )
     
     df_transformed = transform_time_series_data(df=df_raw)
+    
     if cleanup:
-        shutil.rmtree(calories_folder)
+        shutil.rmtree(data_folder)
+        
     return df_transformed

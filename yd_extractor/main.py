@@ -38,9 +38,9 @@ config = {
     "process_kindle": False,
     "fitbit_config": {
         "process_calories": True,
-        "process_sleep": False,
-        "process_steps": False,
-        "process_exercise": False,
+        "process_sleep": True,
+        "process_steps": True,
+        "process_exercise": True,
     },
 }
 
@@ -95,41 +95,31 @@ if __name__ == "__main__":
 
         # Sleep
         if fitbit_config["process_sleep"]:
-            input_folder = (input_data_folder / "sleep")
-            extract_specific_files_flat(
-                zip_file_path=latest_google_zip,
-                prefix=fitbit_relative_folder + "sleep",
-                output_path=input_folder
+            df = fitbit_extractor.process_sleep(
+                input_data_folder=input_data_folder,
+                google_zip_path=latest_google_zip,
+                cleanup=cleanup_unziped_files
             )
-            df = fitbit_extractor.process_sleep(input_folder)
             df.to_csv(output_data_folder / "fitbit_sleep.csv", index=False)
-            if cleanup_unziped_files:
-                shutil.rmtree(input_folder)
+
 
         # Steps
         if fitbit_config["process_steps"]:
-            input_folder = (input_data_folder / "steps")
-            extract_specific_files_flat(
-                zip_file_path=latest_google_zip,
-                prefix=fitbit_relative_folder + "steps",
-                output_path=input_folder
+            df = fitbit_extractor.process_steps(
+                input_data_folder=input_data_folder,
+                google_zip_path=latest_google_zip,
+                cleanup=cleanup_unziped_files
             )
-            df = fitbit_extractor.process_steps(input_folder)
             df.to_csv(output_data_folder / "fitbit_steps.csv", index=False)
-            if cleanup_unziped_files:
-                shutil.rmtree(input_folder)
+
                 
         # Exercise
         if fitbit_config["process_exercise"]:
-            input_folder = (input_data_folder / "exercise")
-            extract_specific_files_flat(
-                zip_file_path=latest_google_zip,
-                prefix=fitbit_relative_folder + "exercise",
-                output_path=input_folder
+            df = fitbit_extractor.process_exercise(
+                input_data_folder=input_data_folder,
+                google_zip_path=latest_google_zip,
+                cleanup=cleanup_unziped_files
             )
-            df = fitbit_extractor.process_exercise(input_folder)
             df.to_csv(output_data_folder / "fitbit_exercise.csv", index=False)
-            if cleanup_unziped_files:
-                shutil.rmtree(input_folder)
-
+          
     logger.info("Finished extracting data.")
