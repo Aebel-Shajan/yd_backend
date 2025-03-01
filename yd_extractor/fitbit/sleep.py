@@ -67,7 +67,7 @@ def transform_sleep(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[:, "end_time"] = pd.to_datetime(df["end_time"]).dt.time
     df = df.groupby(["date"]).aggregate(
         {"start_time": "min", "end_time": "max", "total_duration_hours": "sum"}
-    )
+    ).reset_index()
     return df
 
 

@@ -70,6 +70,6 @@ def transform_time_series_data(df: pd.DataFrame) -> pd.DataFrame:
         {
             "value": "sum",
         }
-    )
+    ).reset_index()
     df["value"] = df["value"].astype(int)
     return df

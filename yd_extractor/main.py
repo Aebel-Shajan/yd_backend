@@ -31,17 +31,17 @@ logger.addHandler(handler)
 
 config = {
     "download_from_drive": False,
+    "cleanup_unziped_files": True,
+    "cleanup_ziped_files": False,
     "process_strong": False,
     "process_github": False,
     "process_kindle": False,
     "fitbit_config": {
-        "process_calories": False,
-        "process_sleep": False,
-        "process_steps": False,
-        "process_exercise": True
+        "process_calories": True,
+        "process_sleep": True,
+        "process_steps": True,
+        "process_exercise": True,
     },
-    "cleanup_unziped_files": True,
-    "cleanup_ziped_files": False
 }
 
 if __name__ == "__main__":
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                 output_path=input_folder
             )
             df = fitbit_extractor.process_calories(input_folder)
-            df.to_csv(output_data_folder / "fitbit_calories.csv")
+            df.to_csv(output_data_folder / "fitbit_calories.csv", index=False)
             if cleanup_unziped_files:
                 shutil.rmtree(input_folder)
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
                 output_path=input_folder
             )
             df = fitbit_extractor.process_sleep(input_folder)
-            df.to_csv(output_data_folder / "fitbit_sleep.csv")
+            df.to_csv(output_data_folder / "fitbit_sleep.csv", index=False)
             if cleanup_unziped_files:
                 shutil.rmtree(input_folder)
 
@@ -118,7 +118,7 @@ if __name__ == "__main__":
                 output_path=input_folder
             )
             df = fitbit_extractor.process_steps(input_folder)
-            df.to_csv(output_data_folder / "fitbit_steps.csv")
+            df.to_csv(output_data_folder / "fitbit_steps.csv", index=False)
             if cleanup_unziped_files:
                 shutil.rmtree(input_folder)
                 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 output_path=input_folder
             )
             df = fitbit_extractor.process_exercise(input_folder)
-            df.to_csv(output_data_folder / "fitbit_exercise.csv")
+            df.to_csv(output_data_folder / "fitbit_exercise.csv", index=False)
             if cleanup_unziped_files:
                 shutil.rmtree(input_folder)
 
