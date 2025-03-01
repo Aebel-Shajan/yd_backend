@@ -31,16 +31,16 @@ logger.addHandler(handler)
 
 config = {
     "download_from_drive": False,
-    "cleanup_unziped_files": True,
+    "cleanup_unziped_files": False,
     "cleanup_ziped_files": False,
     "process_strong": False,
     "process_github": False,
     "process_kindle": False,
     "fitbit_config": {
         "process_calories": True,
-        "process_sleep": True,
-        "process_steps": True,
-        "process_exercise": True,
+        "process_sleep": False,
+        "process_steps": False,
+        "process_exercise": False,
     },
 }
 
@@ -85,16 +85,13 @@ if __name__ == "__main__":
         
         # Calories
         if fitbit_config["process_calories"]:
-            input_folder = (input_data_folder / "calories")
-            extract_specific_files_flat(
-                zip_file_path=latest_google_zip,
-                prefix=fitbit_relative_folder + "calories",
-                output_path=input_folder
+            df = fitbit_extractor.process_calories(
+                input_data_folder=input_data_folder, 
+                google_zip_path=latest_google_zip,
+                cleanup=cleanup_unziped_files
             )
-            df = fitbit_extractor.process_calories(input_folder)
             df.to_csv(output_data_folder / "fitbit_calories.csv", index=False)
-            if cleanup_unziped_files:
-                shutil.rmtree(input_folder)
+
 
         # Sleep
         if fitbit_config["process_sleep"]:
