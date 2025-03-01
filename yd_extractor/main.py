@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import yd_extractor.fitbit as fitbit_extractor
 import yd_extractor.github as github_extractor
 import yd_extractor.kindle as kindle_extractor
+import yd_extractor.strong as strong_extractor
 import gdown
 
 from yd_extractor.utils.colored_logger import ColoredFormatter
@@ -34,15 +35,15 @@ config = {
     "download_from_drive": False,
     "cleanup_unziped_files": False,
     "cleanup_ziped_files": False,
-    "process_strong": False,
-    "process_github": False,
-    "process_kindle": True,
     "fitbit_config": {
         "process_calories": False,
         "process_sleep": False,
         "process_steps": False,
         "process_exercise": False,
     },
+    "process_github": False,
+    "process_kindle": True,
+    "process_strong": True,
 }
 
 class EnvVars(TypedDict):
@@ -158,4 +159,15 @@ if __name__ == "__main__":
             cleanup=config["cleanup_unziped_files"]
         )
         df.to_csv(output_data_folder / "reading.csv", index=False)
+        
+    # Strong
+    if config["process_strong"]:
+        latest_csv = get_latest_file(
+            folder_path=input_data_folder,
+            file_name_glob="strong*.csv"
+        )
+        with open(latest_csv) as csv:
+            df = strong_extractor.process_workouts(csv)
+            df.to_csv(output_data_folder / "strong_workouts.csv")
+    
     logger.info("Finished extracting data.")
