@@ -6,12 +6,12 @@ import sys
 from dotenv import load_dotenv
 
 import yd_extractor.fitbit as fitbit_extractor
+import yd_extractor.github as github_extractor
 import gdown
-import shutil
 
 from yd_extractor.utils.colored_logger import ColoredFormatter
-from yd_extractor.utils.utils import extract_folder_from_zip, extract_specific_files_flat, get_latest_file
-
+from yd_extractor.utils.utils import get_latest_file
+from typing import Optional, TypedDict
 
 # Create a logger
 logger = logging.getLogger()
@@ -34,30 +34,40 @@ config = {
     "cleanup_unziped_files": False,
     "cleanup_ziped_files": False,
     "process_strong": False,
-    "process_github": False,
+    "process_github": True,
     "process_kindle": False,
     "fitbit_config": {
-        "process_calories": True,
-        "process_sleep": True,
-        "process_steps": True,
-        "process_exercise": True,
+        "process_calories": False,
+        "process_sleep": False,
+        "process_steps": False,
+        "process_exercise": False,
     },
 }
 
+class EnvVars(TypedDict):
+    DRIVE_SHARE_URL: Optional[str]
+    GITHUB_TOKEN:  Optional[str]
+    GITHUB_USERNAME:  Optional[str]
+
 if __name__ == "__main__":
+    # Unpack config
     cleanup_ziped_files = config["cleanup_ziped_files"]
     cleanup_unziped_files = config["cleanup_unziped_files"]
     fitbit_config = config["fitbit_config"]
     
+    # Read in .env
     logger.info("Loading environement variables...")
-    load_dotenv()
-    drive_url = os.getenv("DRIVE_SHARE_URL")
-    github_token = os.getenv("GITHUB_TOKEN")
-    if (drive_url is None):
-        logger.warning("Couldn't find google drive share link")
-    if (github_token is None):
-        logger.warning("Couldn't find github token in .env!")
-    
+    load_dotenv(override=True)
+    env_vars: EnvVars = {
+        "DRIVE_SHARE_URL": os.environ.get("DRIVE_SHARE_URL"),
+        "GITHUB_TOKEN": os.environ.get("GITHUB_TOKEN"),
+        "GITHUB_USERNAME": os.environ.get("GITHUB_USERNAME")
+    }
+    for var in env_vars:
+        if env_vars[var] is None:
+            logger.warning("Expected {var} to be in .env!")
+
+    # Setup folder structure
     root_dir = Path(__file__).resolve().parent.parent
     input_data_folder = root_dir / "data" / "input"
     output_data_folder = root_dir / "data" / "output"
@@ -66,15 +76,16 @@ if __name__ == "__main__":
     logger.info(f"Inputs and output data will be stored here: {root_dir / 'data'}")
     
     if config["download_from_drive"]:
-        if (drive_url is None):
+        if (env_vars["DRIVE_SHARE_URL"] is None):
             raise Exception("Expected DRIVE_SHARE_URL in .env folder!")
         logger.info("Downloading data from google drive...")
         gdown.download_folder(
-            url=drive_url,
+            url=env_vars["DRIVE_SHARE_URL"],
             output=str(input_data_folder.absolute()),
             use_cookies=False
         )
     
+    # Fitbit
     if any(list(fitbit_config.values())):
         latest_google_zip = get_latest_file(
             folder_path=input_data_folder,
@@ -121,5 +132,15 @@ if __name__ == "__main__":
                 cleanup=cleanup_unziped_files
             )
             df.to_csv(output_data_folder / "fitbit_exercise.csv", index=False)
-          
+        
+    if (config["process_github"]): 
+        if env_vars["GITHUB_TOKEN"] is None or env_vars["GITHUB_USERNAME"] is None:
+            logger.error(
+                "Couldn't process github data due to missing environment variables!"
+            ) 
+        df = github_extractor.process_repo_contributions(
+            github_username=env_vars["GITHUB_USERNAME"],
+            github_token=env_vars["GITHUB_TOKEN"]
+        )
+        df.to_csv(output_data_folder / "repo_contributions.csv", index=False)
     logger.info("Finished extracting data.")
