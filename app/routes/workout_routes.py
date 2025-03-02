@@ -1,8 +1,13 @@
+import io
+import os
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from app.services.workout_service import create_workout
-from app.services.utils import check_duplicate
+from app.services.workout_service import create_workout, read_in_csv
 from app.schema.workout import WorkoutSchema
+from werkzeug.utils import secure_filename
+from app.config import Config
+import pathlib
+import pandas as pd
 
 workout_bp = Blueprint("workouts", __name__)
 
@@ -17,3 +22,19 @@ def add_workout():
         return jsonify({"error": str(e)})
     
     return jsonify(workout), 201
+
+@workout_bp.route("/upload_file", methods=["POST"])
+def add_workouts_from_file():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['file']
+    if file and Config.allowed_file(file.filename):
+        save_path = os.path.join(Config.UPLOAD_FOLDER, file.filename)
+        file.save(save_path)
+        with open(save_path) as file:
+            read_in_csv(file)
+
+        return jsonify({"message": "CSV uploaded"}), 201
+    
+    return jsonify({"error": "Invalid file type"}), 400
