@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "yd_backend"
+name = "yd_extractor"
 version = "0.1.0"
 description = ""
 authors = ["aebel-shajan <aebelshajan@gmail.com>"]
