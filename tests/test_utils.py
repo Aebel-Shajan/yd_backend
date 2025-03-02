@@ -1,15 +1,12 @@
-from yd_pipeline.utils import (
-    parse_duration, 
-    check_columns_exist, 
-    detect_delimiter,
-    get_latest_file,
-    unzip_file
-)
+
 import pandas as pd
 import pytest
 import zipfile
 import os
 from pathlib import Path
+
+from yd_extractor.utils.pandas import check_columns_exist, detect_delimiter, parse_duration
+from yd_extractor.utils.utils import get_latest_file, unzip_file
 
 class TestParseDuration:
     """Test function parse_duration"""

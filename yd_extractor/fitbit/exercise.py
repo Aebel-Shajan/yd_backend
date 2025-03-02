@@ -4,9 +4,8 @@ from pathlib import Path
 import shutil
 import pandas as pd
 from yd_extractor.fitbit.utils import extract_json_file_data
-from yd_extractor.utils.pandas import convert_columns_to_numeric
+from yd_extractor.utils.pandas import convert_columns_to_numeric, validate_columns
 from yd_extractor.utils.utils import extract_specific_files_flat
-from yd_pipeline.utils import validate_columns
 
 
 def extract_exercise(folder_path: str) -> pd.DataFrame:

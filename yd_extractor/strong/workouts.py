@@ -1,9 +1,5 @@
 import pandas as pd
-from yd_extractor.utils.pandas import validate_columns
-from yd_pipeline.utils import (
-    parse_duration,
-    detect_delimiter,
-)
+from yd_extractor.utils.pandas import detect_delimiter, parse_duration, validate_columns
 from typing import BinaryIO
 
 
