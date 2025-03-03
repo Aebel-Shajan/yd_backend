@@ -15,25 +15,19 @@ def create_workout(data: WorkoutSchema):
         db.commit()
         db.refresh(new_workout)
 
-    return {
-        "id": new_workout.id, 
-        "date": new_workout.date,
-        "name": new_workout.name, 
-        "exercise": new_workout.exercise
-    }
+    return new_workout
     
     
 def read_in_csv(csv_file: BinaryIO):
     df = process_workouts(csv_file)
+    df = df.fillna(value=0)
+    duplicate_rows = 0
+    rows = df.shape[0]
     for index, row in df.iterrows():
-        dict = {
-            "date": row['date'],
-            "name": row["workout_name"],
-            "exercise": row["exercise_name"]
-        }
-        new_workout = WorkoutSchema(**dict)
+        new_workout = WorkoutSchema(**row.to_dict())
         try:
             create_workout(new_workout)
         except ValueError:
-            print("duplicate row: ", str(row) )
+            duplicate_rows += 1
+    return {"message": f"Added {rows - duplicate_rows} rows, found {duplicate_rows} duplicate rows"}
         

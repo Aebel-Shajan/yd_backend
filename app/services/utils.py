@@ -1,11 +1,12 @@
 
 
-from sqlalchemy import and_
+from sqlalchemy import and_, null
 from app.db.database import SessionLocal
+import numpy as np
 
 
 def check_duplicate(model, data: dict) -> bool:
-    """Checks if an identical row exists in the given model.
+    """Checks if an identical row exists in the given model, handling NULL values.
 
     Args:
         model (_type_): SQLAlchemy model.
@@ -14,10 +15,14 @@ def check_duplicate(model, data: dict) -> bool:
     Returns:
         bool: True if duplicate exists, false otherwise.
     """
-    # *[] unpacks list
     with SessionLocal() as db:
-        query = db.query(model).filter(
-            and_(*[getattr(model, key) == value for key, value in data.items()])
-        )
-        duplicate_exists = db.query(query.exists()).scalar()
-        return duplicate_exists
+        filters = []
+        for key, value in data.items():
+            column = getattr(model, key)
+            if value is None or value =="":
+                filters.append(column.is_(null()))  # Handle NULL values properly
+            else:
+                filters.append(column == value)
+        
+        query = db.query(model).filter(and_(*filters))
+        return db.query(query.exists()).scalar()

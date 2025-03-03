@@ -33,8 +33,8 @@ def add_workouts_from_file():
         save_path = os.path.join(Config.UPLOAD_FOLDER, file.filename)
         file.save(save_path)
         with open(save_path) as file:
-            read_in_csv(file)
+            output = read_in_csv(file)
 
-        return jsonify({"message": "CSV uploaded"}), 201
+        return jsonify(output), 201
     
     return jsonify({"error": "Invalid file type"}), 400
