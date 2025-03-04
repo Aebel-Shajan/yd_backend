@@ -1,9 +1,9 @@
 
 from sqlmodel import SQLModel, Session, select, and_, null
-from app.db.database import engine
+from app.database import engine
 import numpy as np
 
-from app.models.models import WorkoutActivity
+from app.models import WorkoutActivity
 
 
 from sqlmodel import select, SQLModel, Session

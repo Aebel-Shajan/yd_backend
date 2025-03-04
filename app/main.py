@@ -1,5 +1,5 @@
 from flask import Flask
-from app.db.database import init_db
+from app.database import init_db
 from app.routes.workout_routes import workout_bp
 import os
 

@@ -1,8 +1,8 @@
 from typing import BinaryIO
 
 from sqlmodel import Session
-from app.db.database import  engine
-from app.models.models import WorkoutActivity
+from app.database import  engine
+from app.models import WorkoutActivity
 from app.services.utils import  is_duplicate
 from yd_extractor.strong import process_workouts
 

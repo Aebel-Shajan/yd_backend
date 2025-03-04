@@ -1,7 +1,7 @@
 import os
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
-from app.models.models import WorkoutActivity
+from app.models import WorkoutActivity
 from app.services.workout_service import create_workout, read_in_csv
 from app.config import Config
 
