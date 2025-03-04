@@ -82,15 +82,15 @@ def transform_exercise(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_exercise(
-    input_data_folder: Path,
-    google_zip_path: Path,
+    inputs_folder: Path,
+    zip_path: Path,
     cleanup: bool=True
 ) -> pd.DataFrame:
     
     # Unzip and extract jsons from zip file.
-    data_folder = input_data_folder / "exercise"
+    data_folder = inputs_folder / "exercise"
     extract_specific_files_flat(
-        zip_file_path=google_zip_path,
+        zip_file_path=zip_path,
         prefix="Takeout/Fitbit/Global Export Data/exercise",
         output_path=data_folder
     )

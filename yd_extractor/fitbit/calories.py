@@ -8,16 +8,16 @@ from .utils import extract_json_file_data, transform_time_series_data
 
 
 def process_calories(
-    input_data_folder: Path,
-    google_zip_path: Path,
+    inputs_folder: Path,
+    zip_path: Path,
     cleanup: bool=True
 ) -> pd.DataFrame:
     """Extract calories from folder then apply some transformations on data."""
     
     # Unzip and extract calories jsons from zip file.
-    data_folder = input_data_folder / "calories"
+    data_folder = inputs_folder / "calories"
     extract_specific_files_flat(
-        zip_file_path=google_zip_path,
+        zip_file_path=zip_path,
         prefix="Takeout/Fitbit/Global Export Data/calories",
         output_path=data_folder
     )

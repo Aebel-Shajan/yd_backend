@@ -99,8 +99,8 @@ if __name__ == "__main__":
         # Calories
         if fitbit_config["process_calories"]:
             df = fitbit_extractor.process_calories(
-                input_data_folder=input_data_folder, 
-                google_zip_path=latest_google_zip,
+                inputs_folder=input_data_folder, 
+                zip_path=latest_google_zip,
                 cleanup=cleanup_unziped_files
             )
             df.to_csv(output_data_folder / "fitbit_calories.csv", index=False)
@@ -109,8 +109,8 @@ if __name__ == "__main__":
         # Sleep
         if fitbit_config["process_sleep"]:
             df = fitbit_extractor.process_sleep(
-                input_data_folder=input_data_folder,
-                google_zip_path=latest_google_zip,
+                inputs_folder=input_data_folder,
+                zip_path=latest_google_zip,
                 cleanup=cleanup_unziped_files
             )
             df.to_csv(output_data_folder / "fitbit_sleep.csv", index=False)
@@ -119,8 +119,8 @@ if __name__ == "__main__":
         # Steps
         if fitbit_config["process_steps"]:
             df = fitbit_extractor.process_steps(
-                input_data_folder=input_data_folder,
-                google_zip_path=latest_google_zip,
+                inputs_folder=input_data_folder,
+                zip_path=latest_google_zip,
                 cleanup=cleanup_unziped_files
             )
             df.to_csv(output_data_folder / "fitbit_steps.csv", index=False)
@@ -129,8 +129,8 @@ if __name__ == "__main__":
         # Exercise
         if fitbit_config["process_exercise"]:
             df = fitbit_extractor.process_exercise(
-                input_data_folder=input_data_folder,
-                google_zip_path=latest_google_zip,
+                inputs_folder=input_data_folder,
+                zip_path=latest_google_zip,
                 cleanup=cleanup_unziped_files
             )
             df.to_csv(output_data_folder / "fitbit_exercise.csv", index=False)

@@ -75,14 +75,14 @@ def transform_sleep(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_sleep(
-    input_data_folder: Path,
-    google_zip_path: Path,
+    inputs_folder: Path,
+    zip_path: Path,
     cleanup: bool=True
 ) -> pd.DataFrame:
     # Unzip and extract calories jsons from zip file.
-    data_folder = input_data_folder / "sleep"
+    data_folder = inputs_folder / "sleep"
     extract_specific_files_flat(
-        zip_file_path=google_zip_path,
+        zip_file_path=zip_path,
         prefix="Takeout/Fitbit/Global Export Data/sleep",
         output_path=data_folder
     )
