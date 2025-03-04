@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Date, Float, Time
 from app.models.base import Base
 
 class Workout(Base):
-    __tablename__ = "workout_actu"
+    __tablename__ = "workout_activity"
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
