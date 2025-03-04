@@ -3,6 +3,26 @@ from sqlmodel import SQLModel, Session, select, and_
 from app.database import engine
 from sqlmodel import select, SQLModel, Session
 from sqlalchemy import and_
+import pandas as pd
+
+def add_activities_df_to_db(
+    df: pd.DataFrame, 
+    model: type[SQLModel],
+):
+    duplicate_rows = 0
+    rows = df.shape[0]
+    for index, row in df.iterrows():
+        new_workout = model(**row.to_dict())
+        try:
+            add_activity_to_db(new_workout, model)
+        except ValueError:
+            duplicate_rows += 1
+    return {
+        "message": (
+            f"Added {rows - duplicate_rows} rows,"
+            f" found {duplicate_rows} duplicate rows"
+        )
+    }
 
 def add_activity_to_db(data: SQLModel, model: type[SQLModel]):
     with Session(engine) as session:

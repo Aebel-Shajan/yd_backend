@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from app.services.reading_service import process_kindle_zip
+from app.services.reading_service import handle_kindle_zip
 
 reading_bp = Blueprint("reading",  __name__)
 
@@ -13,6 +13,8 @@ def add_reading_from_file():
     if file is None or not file.filename.endswith(".zip"):
         return jsonify({"error": "Invalid file type"}), 400
     
-    output = process_kindle_zip(file)
-    
-    return output
+    try:
+        output = handle_kindle_zip(file)
+        return output
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

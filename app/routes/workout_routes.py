@@ -3,7 +3,7 @@ from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from app.models import WorkoutActivity
 from app.services.utils import add_activity_to_db
-from app.services.workout_service import process_strong_csv
+from app.services.workout_service import handle_strong_csv
 from app.config import Config
 
 workout_bp = Blueprint("workouts", __name__)
@@ -26,12 +26,19 @@ def add_workouts_from_file():
         return jsonify({"error": "No file part"}), 400
     
     file = request.files['file']
-    if file and Config.allowed_file(file.filename):
+    
+    if file is None or not file.filename.endswith(".csv"):
+        return jsonify({"error": "Invalid file type"}), 400
+    
+    try:
         save_path = os.path.join(Config.UPLOAD_FOLDER, file.filename)
         file.save(save_path)
+        
         with open(save_path) as file:
-            output = process_strong_csv(file)
-
-        return jsonify(output), 201
+            output = handle_strong_csv(file)
+            return jsonify(output), 201
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
-    return jsonify({"error": "Invalid file type"}), 400
+
