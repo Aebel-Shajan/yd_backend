@@ -1,20 +1,16 @@
-import io
 import os
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
+from app.models.models import WorkoutActivity
 from app.services.workout_service import create_workout, read_in_csv
-from app.schema.schemas import WorkoutSchema
-from werkzeug.utils import secure_filename
 from app.config import Config
-import pathlib
-import pandas as pd
 
 workout_bp = Blueprint("workouts", __name__)
 
 @workout_bp.route("/", methods=["POST"])
 def add_workout():
     try:
-        data = WorkoutSchema(**request.json)
+        data = WorkoutActivity(**request.json)
         workout = create_workout(data)
     except ValidationError as e:
         return jsonify({"error": e.errors()}), 400  # Return validation errors

@@ -1,29 +1,28 @@
-from sqlalchemy import Column, Integer, String, Date, Float, Time
-from app.models.base import Base
+from typing import Optional
+from sqlmodel import Field, SQLModel
+import datetime
 
-class Workout(Base):
-    __tablename__ = "workout_activity"
 
-    id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False)
-    workout_name = Column(String, nullable=False)
-    exercise_name = Column(String, nullable=False)
-    total_sets = Column(Integer, nullable=False)
-    max_weight= Column(Float, nullable=False)
-    total_reps= Column(Integer, nullable=False)
-    total_volume = Column(Float, nullable=False)
-    workout_duration_minutes= Column(Float, nullable=False)
-    distance = Column(Integer, nullable=False)
+
+class WorkoutActivity(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: datetime.date 
+    workout_name: str
+    exercise_name: str
+    total_sets: int
+    max_weight: float
+    total_reps: int
+    total_volume: float
+    workout_duration_minutes: float
+    distance: float
     
 
-class ReadingActivity(Base):
-    __tablename__ = "reading_activity"
-
-    id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False) 
-    start_time = Column(Time, nullable=False)
-    asin = Column(String, nullable=False)
-    total_reading_minutes = Column(Integer, nullable=False)
+class ReadingActivity(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: datetime.date
+    start_time: datetime.time
+    asin: str
+    total_reading_minutes: int
     
 
     

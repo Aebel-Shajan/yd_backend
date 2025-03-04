@@ -1,21 +1,19 @@
 from typing import BinaryIO
-from app.db.database import SessionLocal, engine
-from app.models.models import Workout
-from app.schema.schemas import WorkoutSchema
-from app.services.utils import check_duplicate
+
+from sqlmodel import Session
+from app.db.database import  engine
+from app.models.models import WorkoutActivity
+from app.services.utils import  is_duplicate
 from yd_extractor.strong import process_workouts
 
-def create_workout(data: WorkoutSchema):
-    data_dict =data.model_dump()
-    if check_duplicate(Workout, data_dict):
-        raise ValueError("Workout already exists in table!")
-    with SessionLocal() as db:
-        new_workout = Workout(**data_dict)
-        db.add(new_workout)
+def create_workout(data: WorkoutActivity):
+    with Session(engine) as db:
+        if is_duplicate(db, WorkoutActivity, data):
+            raise ValueError("Workout already exists in table!")
+        db.add(data)
         db.commit()
-        db.refresh(new_workout)
-
-    return new_workout
+        db.refresh(data)
+    return data
     
     
 def read_in_csv(csv_file: BinaryIO):
@@ -24,7 +22,7 @@ def read_in_csv(csv_file: BinaryIO):
     duplicate_rows = 0
     rows = df.shape[0]
     for index, row in df.iterrows():
-        new_workout = WorkoutSchema(**row.to_dict())
+        new_workout = WorkoutActivity(**row.to_dict())
         try:
             create_workout(new_workout)
         except ValueError:
