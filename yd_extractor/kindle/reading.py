@@ -22,9 +22,10 @@ def transform_reading(df: pd.DataFrame) -> pd.DataFrame:
     columns_to_keep = ["ASIN", "start_time", "total_reading_milliseconds"]
     validate_columns(df, columns_to_keep)
     df = df[columns_to_keep].copy()
+    df = df.rename(columns={"ASIN": "asin"})
     df.loc[:, "date"] = pd.to_datetime(df["start_time"], format="ISO8601").dt.date
-    df.loc[:, "start_time"] = pd.to_datetime(df["start_time"], format="ISO8601").dt.strftime('%H:%M:%S')
-    df = df.groupby(["ASIN", "date"]).aggregate(
+    df.loc[:, "start_time"] = pd.to_datetime(df["start_time"], format="ISO8601").dt.time
+    df = df.groupby(["asin", "date"]).aggregate(
         {"start_time": "min", "total_reading_milliseconds": "sum"}
     ).reset_index()
     df["total_reading_minutes"] = df[

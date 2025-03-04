@@ -1,13 +1,17 @@
 
-from sqlmodel import SQLModel, Session, select, and_, null
+from sqlmodel import SQLModel, Session, select, and_
 from app.database import engine
-import numpy as np
-
-from app.models import WorkoutActivity
-
-
 from sqlmodel import select, SQLModel, Session
 from sqlalchemy import and_
+
+def add_activity_to_db(data: SQLModel, model: type[SQLModel]):
+    with Session(engine) as session:
+        if is_duplicate(session, model, data):
+            raise ValueError("Activity already exists in table!")
+        session.add(data)
+        session.commit()
+        session.refresh(data)
+    return data
 
 def is_duplicate(session: Session, model: type[SQLModel], data: SQLModel) -> bool:
     """

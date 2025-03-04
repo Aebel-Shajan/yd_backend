@@ -1,7 +1,9 @@
 from flask import Flask
 from app.database import init_db
 from app.routes.workout_routes import workout_bp
+from app.routes.reading_routes import reading_bp
 import os
+
 
 def create_app():
     app = Flask(__name__)
@@ -10,6 +12,7 @@ def create_app():
     init_db()
 
     app.register_blueprint(workout_bp, url_prefix="/workouts")
+    app.register_blueprint(reading_bp, url_prefix="/reading")
 
     return app
 

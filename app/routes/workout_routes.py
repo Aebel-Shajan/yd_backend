@@ -2,7 +2,8 @@ import os
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from app.models import WorkoutActivity
-from app.services.workout_service import create_workout, read_in_csv
+from app.services.utils import add_activity_to_db
+from app.services.workout_service import process_strong_csv
 from app.config import Config
 
 workout_bp = Blueprint("workouts", __name__)
@@ -11,7 +12,7 @@ workout_bp = Blueprint("workouts", __name__)
 def add_workout():
     try:
         data = WorkoutActivity(**request.json)
-        workout = create_workout(data)
+        workout = add_activity_to_db(data, WorkoutActivity)
     except ValidationError as e:
         return jsonify({"error": e.errors()}), 400  # Return validation errors
     except ValueError as e:
@@ -29,7 +30,7 @@ def add_workouts_from_file():
         save_path = os.path.join(Config.UPLOAD_FOLDER, file.filename)
         file.save(save_path)
         with open(save_path) as file:
-            output = read_in_csv(file)
+            output = process_strong_csv(file)
 
         return jsonify(output), 201
     
