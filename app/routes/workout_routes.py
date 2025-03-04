@@ -3,7 +3,7 @@ import os
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from app.services.workout_service import create_workout, read_in_csv
-from app.schema.workout import WorkoutSchema
+from app.schema.schemas import WorkoutSchema
 from werkzeug.utils import secure_filename
 from app.config import Config
 import pathlib

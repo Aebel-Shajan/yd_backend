@@ -15,3 +15,13 @@ class WorkoutSchema(BaseModel):
 
     class Config:
         from_attributes = True
+        
+
+class ReadingActivitySchema(BaseModel):
+    date: PastDate
+    start_time: time
+    asin: str
+    total_reading_minutes: int
+    
+    class Config:
+        from_attributes = True

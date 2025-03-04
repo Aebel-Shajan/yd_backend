@@ -1,7 +1,7 @@
 from typing import BinaryIO
 from app.db.database import SessionLocal, engine
-from app.models.workout import Workout
-from app.schema.workout import WorkoutSchema
+from app.models.models import Workout
+from app.schema.schemas import WorkoutSchema
 from app.services.utils import check_duplicate
 from yd_extractor.strong import process_workouts
 
