@@ -4,7 +4,37 @@ import datetime
 import time
 
 
+class TimeSeriesActivity(SQLModel):
+    date: datetime.date 
+    value: float
 
+class CalorieActivity(TimeSeriesActivity, table=True):
+    __tablename__="calorie_activity"
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+class StepActivity(TimeSeriesActivity, table=True):
+    __tablename__="step_activity"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    
+class SleepActivity(SQLModel, table=True):
+    __tablename__="sleep_activity"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    start_time: datetime.time
+    end_time: datetime.time
+    total_duration_hours: float
+    
+class ExerciseActivity(SQLModel, table=True):
+    __tablename__="exercise_activity"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    date: datetime.date
+    start_time: datetime.time
+    activity_name: str
+    average_heart_rate: float
+    calories: int
+    active_duration: int
+    distance: Optional[float] = Field(default=0)
+    pace: Optional[float] = Field(default=0)
+    
 class WorkoutActivity(SQLModel, table=True):
     __tablename__ = "workout_activity"
     id: Optional[int] = Field(default=None, primary_key=True)
