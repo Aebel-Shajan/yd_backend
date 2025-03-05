@@ -1,7 +1,7 @@
 from typing import Optional
 from sqlmodel import Field, SQLModel, Time, Date
 import datetime
-import time
+from pydantic import BaseModel
 
 
 class TimeSeriesActivity(SQLModel):
@@ -57,5 +57,14 @@ class ReadingActivity(SQLModel, table=True):
     asin: str
     total_reading_minutes: int
     
-
     
+# Pydantic Models
+
+class ValueColMetaData(BaseModel):
+    col: str
+    units: str
+    
+class ActivityMetaData(BaseModel):
+    date_col: str
+    value_cols: list[ValueColMetaData]
+    filter_cols: list[str]
