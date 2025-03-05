@@ -16,8 +16,8 @@ def add_workout():
         workout = add_activity_to_db(data, WorkoutActivity)
     except ValidationError as e:
         return jsonify({"error": e.errors()}), 400  # Return validation errors
-    except ValueError as e:
-        return jsonify({"error": str(e)})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
     return jsonify(workout), 201
 
