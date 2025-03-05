@@ -2,7 +2,7 @@ import os
 from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from app.models import WorkoutActivity
-from app.services.utils import add_activity_to_db
+from app.services.utils import add_activity_to_db, selct_activities_from_db
 from app.services.workout_service import handle_strong_csv
 from app.config import Config
 
@@ -41,4 +41,31 @@ def add_workouts_from_file():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
+@workout_bp.route("/get_activities", methods=["GET"])
+def get_workout_activites():
+    try:
+        activities = selct_activities_from_db(WorkoutActivity)
+        return jsonify(
+            {
+                "data": activities,
+                "metadata": {
+                    "filter_cols": [
+                        "workout_name",
+                        "exercise_name"
+                    ],
+                    "value_cols":[
+                        {
+                            "col": "total_volume",
+                            "unit": "kg"
+                        },
+                        {
+                            "col": "workout_duration_minutes",
+                            "units": "minutes"
+                        }
+                    ],
+                    "date_col": "date"
+                }
+            }
+        ), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500

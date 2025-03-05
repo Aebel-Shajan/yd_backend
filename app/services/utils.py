@@ -5,6 +5,13 @@ from sqlmodel import select, SQLModel, Session
 from sqlalchemy import and_
 import pandas as pd
 
+def selct_activities_from_db(model: type[SQLModel]):
+    with Session(engine) as session:
+        statement = select(model)
+        results = session.exec(statement)
+
+        return [result.model_dump() for result in results]
+
 def add_activities_df_to_db(
     df: pd.DataFrame, 
     model: type[SQLModel],
