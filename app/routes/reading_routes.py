@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify, request
+from app.models import ActivityMetaData, ReadingActivity, ValueColMetaData
+from app.routes.utils import get_activities
 from app.services.reading_service import handle_kindle_zip
 
 reading_bp = Blueprint("reading",  __name__)
@@ -18,3 +20,21 @@ def add_reading_from_file():
         return output
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@reading_bp.route("/get_activities/<path:year>", methods=["GET"])
+def get_workout_activities(year: str):
+    return get_activities(
+        year=year,
+        model=ReadingActivity,
+        metadata=ActivityMetaData(
+            date_col="date",
+            filter_cols=["asin"],
+            value_cols=[
+                ValueColMetaData(
+                    col="total_reading_minutes",
+                    units="minutes"
+                )
+            ]
+        )
+    )

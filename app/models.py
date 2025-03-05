@@ -1,5 +1,6 @@
 from typing import Optional
-from sqlmodel import Field, SQLModel, Time, Date
+from sqlalchemy import Column
+from sqlmodel import Field, SQLModel, TIME
 import datetime
 from pydantic import BaseModel
 
@@ -53,7 +54,7 @@ class ReadingActivity(SQLModel, table=True):
     __tablename__ = "reading_activity"
     id: Optional[int] = Field(default=None, primary_key=True)
     date: datetime.date
-    start_time: datetime.time
+    start_time: datetime.time = Field(sa_column=Column(TIME))
     asin: str
     total_reading_minutes: int
     

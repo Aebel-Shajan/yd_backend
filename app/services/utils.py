@@ -9,7 +9,7 @@ def selct_activities_from_db(model: type[SQLModel], year: int):
     with Session(engine) as session:
         statement = select(model).where(extract('year', getattr(model, "date")) == year)
         results = session.exec(statement)
-        return [result.model_dump() for result in results]
+        return [result.model_dump(mode="json") for result in results]
 
 def add_activities_df_to_db(
     df: pd.DataFrame, 
