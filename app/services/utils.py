@@ -1,15 +1,14 @@
 
-from sqlmodel import SQLModel, Session, select, and_
+from sqlmodel import SQLModel, Session, select, and_, extract
 from app.database import engine
 from sqlmodel import select, SQLModel, Session
 from sqlalchemy import and_
 import pandas as pd
 
-def selct_activities_from_db(model: type[SQLModel]):
+def selct_activities_from_db(model: type[SQLModel], year: int):
     with Session(engine) as session:
-        statement = select(model)
+        statement = select(model).where(extract('year', getattr(model, "date")) == year)
         results = session.exec(statement)
-
         return [result.model_dump() for result in results]
 
 def add_activities_df_to_db(

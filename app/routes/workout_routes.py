@@ -41,10 +41,14 @@ def add_workouts_from_file():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@workout_bp.route("/get_activities", methods=["GET"])
-def get_workout_activites():
+@workout_bp.route("/get_activities/<path:year>", methods=["GET"])
+def get_workout_activites(year: str):
+    if year is None:
+        return jsonify({"error": "Error expected year query parameter."}), 400
+    
+    year: int = int(year)
     try:
-        activities = selct_activities_from_db(WorkoutActivity)
+        activities = selct_activities_from_db(WorkoutActivity, year)
         return jsonify(
             {
                 "data": activities,
