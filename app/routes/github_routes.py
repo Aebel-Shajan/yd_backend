@@ -4,7 +4,8 @@ import os
 from dotenv import load_dotenv
 from flask import Blueprint, jsonify, redirect, request, session
 import requests
-from app.models import GithubActivity
+from app.models import ActivityMetaData, GithubActivity, ValueColMetaData
+from app.routes.utils import get_activities
 from app.services.utils import add_activities_df_to_db
 from yd_extractor.github import process_repo_contributions
 
@@ -56,3 +57,21 @@ def github_callback():
     output = add_activities_df_to_db(df, GithubActivity)
     
     return jsonify(output), 201  # Replace with a redirect or UI response
+
+
+@github_bp.route("/<int:year>", methods=["GET"])
+def get_workout_activities(year: str):
+    return get_activities(
+        year=year,
+        model=GithubActivity,
+        metadata=ActivityMetaData(
+            date_col="date",
+            filter_cols=["repository_name"],
+            value_cols=[
+                ValueColMetaData(
+                    col="total_commits",
+                    units="commits"
+                )
+            ]
+        )
+    )
