@@ -20,6 +20,7 @@ class StepActivity(TimeSeriesActivity, table=True):
 class SleepActivity(SQLModel, table=True):
     __tablename__="sleep_activity"
     id: Optional[int] = Field(default=None, primary_key=True)
+    date: datetime.date 
     start_time: datetime.time
     end_time: datetime.time
     total_duration_hours: float
