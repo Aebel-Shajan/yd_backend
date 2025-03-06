@@ -43,7 +43,7 @@ def add_workouts_from_file():
         return jsonify({"error": str(e)}), 500
     
 
-@workout_bp.route("/get_activities/<path:year>", methods=["GET"])
+@workout_bp.route("/<path:year>", methods=["GET"])
 def get_workout_activities(year: str):
     return get_activities(
         year=year,

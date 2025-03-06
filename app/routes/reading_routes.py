@@ -22,7 +22,7 @@ def add_reading_from_file():
         return jsonify({"error": str(e)}), 500
     
 
-@reading_bp.route("/get_activities/<path:year>", methods=["GET"])
+@reading_bp.route("/<path:year>", methods=["GET"])
 def get_workout_activities(year: str):
     return get_activities(
         year=year,
