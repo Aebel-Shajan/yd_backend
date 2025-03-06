@@ -18,6 +18,6 @@ def get_activities(year: str, model: type[SQLModel], metadata: ActivityMetaData)
                 "data": activities,
                 "metadata": metadata.model_dump()
             }
-        ), 201
+        ), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
