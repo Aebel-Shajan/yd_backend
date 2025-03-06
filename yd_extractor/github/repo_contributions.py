@@ -64,6 +64,7 @@ def unpack_contributions_dict(contributions_for_repo: dict) -> list[dict]:
     ]
     return node_list
 
+#TODO make year a parameter!!
 def extract_repo_contributions(
     github_username: str,
     github_token: str

@@ -5,6 +5,15 @@ import datetime
 from pydantic import BaseModel
 
 
+class GithubActivity(SQLModel, table=True):
+    __tablename__="github_activity"
+    id: Optional[int] = Field(default=None, primary_key=True)
+    total_commits: int
+    date: datetime.date
+    repository_name: str
+    repository_url: str
+    repository_image: str
+
 class TimeSeriesActivity(SQLModel):
     date: datetime.date 
     value: float
