@@ -4,13 +4,15 @@ from app.routes.workout_routes import workout_bp
 from app.routes.reading_routes import reading_bp
 from app.routes.fitbit_routes import fitbit_bp
 from app.routes.github_routes import github_bp
+from app.config import Config  # Instead of "config"
 import os
 
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = "super secret key"
-    app.config.from_object("config")
+    app.config.from_object(Config)  
+
 
     init_db()
 
