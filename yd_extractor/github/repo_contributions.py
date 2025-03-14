@@ -66,9 +66,13 @@ def unpack_contributions_dict(contributions_for_repo: dict) -> list[dict]:
 
 #TODO make year a parameter!!
 def extract_repo_contributions(
-    github_username: str,
-    github_token: str
+    github_token: str,
+    year: int
 ) -> pd.DataFrame:
+    
+    if year < 2005:
+        raise Exception("Can't load contributions from before 2005!")
+    
     # Load query from seperate file
     query = None
     path_to_query = (
@@ -83,9 +87,8 @@ def extract_repo_contributions(
     
     # Post request to github graphql api
     variables = {
-        "username": github_username,
-        "from": "2024-01-01T00:00:00Z",
-        "to": "2024-12-31T23:59:59Z",
+        "from": f"{year}-01-01T00:00:00Z",
+        "to": f"{year}-12-31T23:59:59Z",
     }
     headers = {"Authorization": f"Bearer {github_token}"}
     repos_url = f"https://api.github.com/graphql"
@@ -99,7 +102,7 @@ def extract_repo_contributions(
 
     # Turn response object into pandas dataframe
     response_json = response.json()
-    contributions_by_repos = response_json["data"]["user"]["contributionsCollection"][
+    contributions_by_repos = response_json["data"]["viewer"]["contributionsCollection"][
         "commitContributionsByRepository"
     ]
     full_contribution_list = []
@@ -133,9 +136,9 @@ def transform_repo_contributions(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def process_repo_contributions(
-    github_username: str,
-    github_token: str
+    github_token: str,
+    year=2025
 ) -> pd.DataFrame:
-    df_raw = extract_repo_contributions(github_username, github_token)
+    df_raw = extract_repo_contributions(github_token, year)
     df_transformed = transform_repo_contributions(df_raw)
     return df_transformed

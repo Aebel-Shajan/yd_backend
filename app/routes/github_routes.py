@@ -50,17 +50,24 @@ def github_callback():
     access_token = token_data["access_token"]
     session["github_token"] = access_token  # Store in session
 
-    df = process_repo_contributions(
-        github_username="aebel-shajan", # TODO: MAKE THIS PROGRAMTIC
-        github_token=access_token
-    )
+    return "Success: Successfully authenticated with github.", 200
+
+
+@github_bp.route("/<int:year>", methods=["POST"])
+def retrieve_github_activity(year: int):
+    try:
+        github_token = session["github_token"]
+        if github_token is None:
+            raise Exception("Error no github token found!")
+    except:
+        return jsonify({"error": "Authenticate first!"}), 401
+    df = process_repo_contributions(github_token ,year)
     output = add_activities_df_to_db(df, GithubActivity)
-    
-    return jsonify(output), 201  # Replace with a redirect or UI response
+    return jsonify(output), 201
 
 
 @github_bp.route("/<int:year>", methods=["GET"])
-def get_workout_activities(year: str):
+def get_workout_activities(year: int):
     return get_activities(
         year=year,
         model=GithubActivity,

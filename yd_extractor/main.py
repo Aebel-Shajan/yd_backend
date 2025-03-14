@@ -142,7 +142,6 @@ if __name__ == "__main__":
                 "Couldn't process github data due to missing environment variables!"
             ) 
         df = github_extractor.process_repo_contributions(
-            github_username=env_vars["GITHUB_USERNAME"],
             github_token=env_vars["GITHUB_TOKEN"]
         )
         df.to_csv(output_data_folder / "repo_contributions.csv", index=False)

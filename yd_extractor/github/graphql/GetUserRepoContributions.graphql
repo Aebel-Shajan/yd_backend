@@ -1,5 +1,5 @@
-query GetUserRepoContributions($username: String!, $from: DateTime, $to: DateTime) {
-  user(login: $username) {
+query GetUserRepoContributions($from: DateTime, $to: DateTime) {
+  viewer {
     contributionsCollection(from: $from, to: $to) {
       commitContributionsByRepository {
         contributions(first: 100) {
