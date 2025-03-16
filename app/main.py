@@ -11,7 +11,9 @@ import os
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
-app.config.from_object(Config)  
+app.config.from_object(Config)
+app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+  
 CORS(
     app=app, 
     resources={
