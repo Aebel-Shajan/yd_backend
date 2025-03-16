@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, session
+from flask_cors import CORS
 from app.database import init_db
 from app.routes.workout_routes import workout_bp
 from app.routes.reading_routes import reading_bp
@@ -11,6 +12,14 @@ import os
 app = Flask(__name__)
 app.secret_key = "super secret key"
 app.config.from_object(Config)  
+CORS(
+    app=app, 
+    resources={
+        r"/*": {
+            "origins": "http://localhost:5173"
+        }
+    }
+)
 
 init_db()
 
