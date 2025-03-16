@@ -18,7 +18,10 @@ CORS(
     app=app, 
     resources={
         r"/*": {
-            "origins": "http://localhost:5173"
+            "origins": [
+                "http://localhost:5173",
+                "https://year-in-data.vercel.app",
+            ]
         }
     },
     supports_credentials=True
