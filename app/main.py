@@ -18,7 +18,8 @@ CORS(
         r"/*": {
             "origins": "http://localhost:5173"
         }
-    }
+    },
+    supports_credentials=True
 )
 
 init_db()
