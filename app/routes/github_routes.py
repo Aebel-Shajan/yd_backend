@@ -71,6 +71,23 @@ def github_callback():
     return "Success: Successfully authenticated with github.", 200
 
 
+@github_bp.route("/auth_status", methods=["GET"])
+def get_auth_status():
+    is_authenticated = True
+    username = ""
+    try:
+        session["github_token"]
+        username = session["github_username"]
+    except KeyError: 
+        is_authenticated = False
+
+    if username != "Aebel-Shajan":
+        is_authenticated = False
+    
+    return jsonify({"is_authenticated": is_authenticated}), 200
+
+
+
 @github_bp.route("/<int:year>", methods=["POST"])
 def retrieve_github_activity(year: int):
     df = process_repo_contributions(session["github_token"] ,year)
