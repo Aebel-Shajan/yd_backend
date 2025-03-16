@@ -48,20 +48,33 @@ def github_callback():
         return "Error: Could not get access token", 400
 
     access_token = token_data["access_token"]
-    session["github_token"] = access_token  # Store in session
+    
+    
+    # Get username
+    response = requests.post(
+        url="https://api.github.com/user",
+        headers={
+            "Authorization": f"token {access_token}"
+        }
+    )
+    user_data = response.json()
+    if "login" not in user_data:
+        return "Error: Could not get github username", 400
+    
+    username = user_data["login"]
+    
+    if username != "Aebel-Shajan":
+        return f"Error: Only aebel-shajan can access this api! sos {username}"
 
+    # Store in session
+    session["github_username"] = username
+    session["github_token"] = access_token 
     return "Success: Successfully authenticated with github.", 200
 
 
 @github_bp.route("/<int:year>", methods=["POST"])
 def retrieve_github_activity(year: int):
-    try:
-        github_token = session["github_token"]
-        if github_token is None:
-            raise Exception("Error no github token found!")
-    except:
-        return jsonify({"error": "Authenticate first!"}), 401
-    df = process_repo_contributions(github_token ,year)
+    df = process_repo_contributions(session["github_token"] ,year)
     output = add_activities_df_to_db(df, GithubActivity)
     return jsonify(output), 201
 
