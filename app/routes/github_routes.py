@@ -21,7 +21,6 @@ github_bp = Blueprint("github", __name__ )
 # Authenticate user.
 @github_bp.route("/auth", methods=["GET"])
 def github_login():
-    # TODO: USE GITHUB APPS INSTEAD. THEY BE GIVING US TOO MUCH ACCESS WITH OAUTH!!
     github_auth_url = f"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&scope=repo,user"
     return redirect(github_auth_url)
 
