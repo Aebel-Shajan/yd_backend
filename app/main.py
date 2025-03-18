@@ -28,6 +28,8 @@ CORS(
 )
 
 init_db()
+if not os.path.exists(Config.UPLOAD_FOLDER):
+    os.makedirs(Config.UPLOAD_FOLDER)
 
 app.register_blueprint(workout_bp, url_prefix="/workouts")
 app.register_blueprint(reading_bp, url_prefix="/reading")
