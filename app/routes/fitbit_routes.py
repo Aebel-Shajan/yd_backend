@@ -18,7 +18,7 @@ def add_fitbit_data_from_file():
     
     try:
         output = handle_fitbit_zip(file)
-        return output
+        return jsonify(output), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     

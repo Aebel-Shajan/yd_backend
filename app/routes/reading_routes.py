@@ -17,10 +17,10 @@ def add_reading_from_file():
     
     try:
         output = handle_kindle_zip(file)
-        return output
+        return jsonify(output), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 
 @reading_bp.route("/<path:year>", methods=["GET"])
 def get_workout_activities(year: str):
