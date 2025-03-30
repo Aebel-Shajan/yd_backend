@@ -39,15 +39,15 @@ async def upload_strong_data(
     }
     
     
-@router.get("/get-data/{year}")
-async def get_strong_data(
+@router.get("/workouts/{year}")
+async def get_strong_workouts(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
     output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
     data_file_id = query_drive_file(
         credentials, 
-        name="strong.csv", 
+        name="strong_workouts.csv", 
         parent_id=output_folder_id
     )
     if data_file_id:    
