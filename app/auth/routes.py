@@ -32,7 +32,7 @@ async def google_login(request: Request):
     return RedirectResponse(url=authorization_url)
 
 @router.get("/logout")
-async def logout(request):
+async def logout(request: Request):
     """Logout and clear session."""
     # Clear the session
     request.session.clear()
