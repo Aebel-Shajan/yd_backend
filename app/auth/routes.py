@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from google_auth_oauthlib.flow import Flow
@@ -57,6 +58,10 @@ async def google_callback(request: Request, code: str, state: str):
     
     flow.fetch_token(code=code)
     credentials = flow.credentials
+    
+    # TODO: REMOVE IN PROD
+    with open("credentials.json", "w") as f:
+        json.dump(credentials_to_dict(flow.credentials), f, indent=4)
     
     # Get user info
     service = build('oauth2', 'v2', credentials=credentials)

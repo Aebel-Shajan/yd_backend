@@ -1,18 +1,29 @@
+import json
 from fastapi import HTTPException, Request, status
 from google.oauth2.credentials import Credentials
+import pathlib
 
 
 
 def get_current_user_credentials(request:Request):
     """Validate and retrieve user credentials from session."""
     # Retrieve credentials from session
-    credentials_dict = request.session.get('credentials')
+    credentials_dict: dict = request.session.get('credentials')
+    
+    
     
     if not credentials_dict:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated"
-        )
+        # TODO: REMOVE THIS IN PROD (ONLY FOR DEBUG PURPOSES.) #########################
+        credentials_path = pathlib.Path("credentials.json")
+        if credentials_path.exists():
+            with open(credentials_path, "r") as f:
+                credentials_dict = json.load(f)
+        else:
+        ################################################################################
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authenticated"
+            )
     
     try:
         # Convert dictionary back to Credentials object
