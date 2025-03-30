@@ -1,0 +1,132 @@
+import io
+from typing import Optional
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+
+
+def get_user_info(credentials: Credentials):
+    service = build("oauth2", "v2", credentials=credentials)
+    user_info = service.userinfo().get().execute()
+    return user_info
+
+
+def query_or_create_nested_folder(credentials: Credentials, folder_path:str):
+    service = build("drive", "v3", credentials=credentials)
+    folder_names = folder_path.strip("/").split("/")
+    parent_id = None
+
+    for folder_name in folder_names:
+        # Build the query
+        query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        if parent_id:
+            query += f" and '{parent_id}' in parents"
+
+        # Search for the folder
+        results = service.files().list(
+            q=query,
+            spaces='drive',
+            fields='files(id, name)',
+            pageSize=1
+        ).execute()
+        items = results.get('files', [])
+
+        if items:
+            # Folder exists
+            parent_id = items[0]['id']
+        else:
+            # Create the folder
+            file_metadata = {
+                'name': folder_name,
+                'mimeType': 'application/vnd.google-apps.folder',
+                'parents': [parent_id] if parent_id else []
+            }
+            folder = service.files().create(body=file_metadata, fields='id').execute()
+            parent_id = folder['id']
+
+    return parent_id
+
+
+def get_file_name_from_id(credentials: Credentials, file_id: str):
+    # Get file metadata first to get the name
+    drive_service = build("drive", "v3", credentials=credentials)
+    file_metadata = drive_service.files().get(fileId=file_id).execute()
+    filename = file_metadata["name"]
+    return filename
+
+
+def query_drive_file(
+    credentials: Credentials, 
+    name:str, 
+    parent_id:Optional[str]=None
+) -> Optional[str]:
+    service = build("drive", "v3", credentials=credentials)
+    query = f"name = '{name}' and trashed = false"
+    if parent_id:
+        query += f"and '{parent_id}' in parents"
+        
+    results = service.files().list(
+        q=query,
+        spaces='drive',
+        fields="files(id)",
+    ).execute()
+
+    files = results.get('files', [])
+    file_ids = [file["id"] for file in files]
+    
+    if len(file_ids > 1):
+        return file_ids
+    return None
+
+
+def upload_or_overwrite(credentials: Credentials, file_path, file_name, parent_id):    
+    service = build("drive", "v3", credentials=credentials)
+    
+    # Step 1: Check if file already exists
+    existing_file_id = query_drive_file(credentials, file_name, parent_id)
+
+    # Step 2: Prepare media and metadata
+    media = MediaFileUpload(file_path, resumable=True) 
+    file_metadata = {
+        'name': file_name,
+        'parents': [parent_id]
+    }
+
+    if existing_file_id:
+        # Step 3A: Overwrite existing file
+        updated = (
+            service
+            .files()
+            .update(
+                fileId=existing_file_id,
+                media_body=media,
+            )
+            .execute()
+        )
+        print(f"✅ Overwritten file ID: {updated['id']}")
+        return updated['id']
+    else:
+        # Step 3B: Upload new file
+        uploaded = service.files().create(
+            body=file_metadata,
+            media_body=media,
+            fields='id'
+        ).execute()
+        print(f"🆕 Uploaded new file ID: {uploaded['id']}")
+        return uploaded['id']
+    
+
+def download_file(credentials: Credentials, file_id:str) -> io.BytesIO:
+    drive_service = build("drive", "v3", credentials=credentials)
+    # Download file
+    request = drive_service.files().get_media(fileId=file_id)
+    file_io = io.BytesIO()
+    downloader = MediaIoBaseDownload(file_io, request)
+    
+    done = False
+    while done is False:
+        status, done = downloader.next_chunk()
+
+    file_io.seek(0)
+    
+    return file_io
