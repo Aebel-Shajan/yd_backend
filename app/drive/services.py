@@ -74,8 +74,8 @@ def query_drive_file(
     files = results.get('files', [])
     file_ids = [file["id"] for file in files]
     
-    if len(file_ids > 1):
-        return file_ids
+    if len(file_ids) > 0:
+        return file_ids[0]
     return None
 
 
