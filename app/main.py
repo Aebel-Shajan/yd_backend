@@ -4,7 +4,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.config import Config
 from app.auth.routes import router as auth_router
 from app.drive.routes import router as drive_router
-from app.data_sources.strong.routes import router as strong_router
+from app.data_sources.routes import router as data_source_router
 
 
 
@@ -22,9 +22,9 @@ app.add_middleware(
     # https_only=True
 )
 
-app.include_router(auth_router, prefix="/auth")
-app.include_router(drive_router, prefix="/drive")
-app.include_router(strong_router, prefix="/data-sources/strong")
+app.include_router(auth_router)
+app.include_router(drive_router)
+app.include_router(data_source_router)
 
 
 if __name__ == "__main__":

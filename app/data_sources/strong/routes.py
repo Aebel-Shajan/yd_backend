@@ -12,7 +12,7 @@ from yd_extractor import strong
 from app.config import Config
 import os
 
-router = APIRouter()
+router = APIRouter(prefix="/strong")
 
 
 @router.post("/upload-data")
@@ -59,7 +59,6 @@ async def get_strong_data(
         # Replace nan values
         df = df.fillna("")
         data  = df.to_dict(orient='records')
-        print(data)
         return {
             "status": "success",
             "data": data

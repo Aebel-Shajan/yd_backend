@@ -8,7 +8,7 @@ from app.auth.services import credentials_to_dict
 from app.config import Config
 
 
-router = APIRouter()
+router = APIRouter(prefix="/auth")
 
 @router.get("/login")
 async def google_login(request: Request):

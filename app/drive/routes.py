@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 from app.auth.services import get_current_user_credentials
 
 
-router = APIRouter()
+router = APIRouter(prefix="/drive")
 
 
 @router.get("/files")
