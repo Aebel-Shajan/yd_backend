@@ -3,6 +3,7 @@ from typing import Optional
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+import pandas as pd
 
 
 def get_user_info(credentials: Credentials):
@@ -130,3 +131,45 @@ def download_file(credentials: Credentials, file_id:str) -> io.BytesIO:
     file_io.seek(0)
     
     return file_io
+
+
+def get_data_from_csv(
+    credentials: Credentials, 
+    csv_name: str, 
+    year: int,
+    date_col: str="date"
+) -> Optional[dict]:
+    """Returns a json response from a csv file on google drive.
+
+    Args:
+        credentials (Credentials): Google oauth2 credentials
+        csv_name (str): Name of csv file in 'year-in-data/outputs' folder in google 
+            drive.
+        year (int): Year to filter on
+        date_col (str, optional): Name of date column. Used because of errors when
+            converting pandas date column to dict. Defaults to "date".
+
+    Returns:
+        Optional[dict]: Output json dict or None if csv file not found in drive.
+    """
+    output_folder_id = query_or_create_nested_folder(
+        credentials, 
+        "year-in-data/outputs"
+    )
+    data_file_id = query_drive_file(
+        credentials, 
+        name=csv_name, 
+        parent_id=output_folder_id
+    )
+    data = None
+    if data_file_id:    
+        file = download_file(credentials, data_file_id)
+        df = pd.read_csv(file)
+        # Ensure the date column is in datetime format 
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+        df = df[df['date'].dt.year == year]
+        # Replace nan values
+        df = df.fillna("")
+        data  = df.to_dict(orient='records')
+        
+    return data
