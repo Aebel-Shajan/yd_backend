@@ -53,6 +53,52 @@ async def upload_google_takeout_data(
             parent_id=output_folder_id
         )
         os.remove(save_path)
+        
+        # Sleep
+        df = fitbit.process_sleep(
+            inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
+            zip_path=zip_file_path
+        )
+        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_sleep.csv"
+        df.to_csv(save_path, index=False)
+        upload_or_overwrite(
+            credentials=credentials, 
+            file_path=save_path, 
+            file_name="fitbit_sleep.csv",
+            parent_id=output_folder_id
+        )
+        os.remove(save_path)
+        
+        # Exercises
+        df = fitbit.process_exercise(
+            inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
+            zip_path=zip_file_path
+        )
+        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_exercises.csv"
+        df.to_csv(save_path, index=False)
+        upload_or_overwrite(
+            credentials=credentials, 
+            file_path=save_path, 
+            file_name="fitbit_exercises.csv",
+            parent_id=output_folder_id
+        )
+        os.remove(save_path)
+        
+        # Steps
+        df = fitbit.process_steps(
+            inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
+            zip_path=zip_file_path
+        )
+        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_steps.csv"
+        df.to_csv(save_path, index=False)
+        upload_or_overwrite(
+            credentials=credentials, 
+            file_path=save_path, 
+            file_name="fitbit_steps.csv",
+            parent_id=output_folder_id
+        )
+        os.remove(save_path)
+        
     
     # Youtube
     if check_folder_exists_in_zip(zip_file_path, "Takeout/YouTube and YouTube Music/history"):
