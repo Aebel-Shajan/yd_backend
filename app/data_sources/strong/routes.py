@@ -3,6 +3,7 @@ from google.oauth2.credentials import Credentials
 import pandas as pd
 from app.auth.services import get_current_user_credentials
 from app.drive.services import (
+    get_data_from_csv,
     query_or_create_nested_folder,
     upload_or_overwrite,
     download_file,
@@ -21,14 +22,14 @@ async def upload_strong_data(
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
     output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
-    save_path = Config.UPLOAD_FOLDER + "strong.csv"
+    save_path = Config.UPLOAD_FOLDER + "strong_workouts.csv"
     with file.file as csv_file:
         df = strong.process_workouts(csv_file)
         df.to_csv(save_path, index=False)
         upload_or_overwrite(
             credentials=credentials, 
             file_path=save_path, 
-            file_name="strong.csv",
+            file_name="strong_workouts.csv",
             parent_id=output_folder_id
         )
     os.remove(save_path)
@@ -44,21 +45,13 @@ async def get_strong_workouts(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
-    data_file_id = query_drive_file(
-        credentials, 
-        name="strong_workouts.csv", 
-        parent_id=output_folder_id
+    data = get_data_from_csv(
+        credentials,
+        csv_name="strong_workouts.csv",
+        year=year
     )
-    if data_file_id:    
-        file = download_file(credentials, data_file_id)
-        df = pd.read_csv(file)
-        # Ensure the date column is in datetime format 
-        df['date'] = pd.to_datetime(df['date'], errors='coerce')
-        df = df[df['date'].dt.year == year]
-        # Replace nan values
-        df = df.fillna("")
-        data  = df.to_dict(orient='records')
+    
+    if data:
         return {
             "status": "success",
             "data": data
