@@ -18,7 +18,9 @@ def detect_delimiter(csv_file: BinaryIO) -> str:
         The detected delimiter (e.g. ',', ';', '\t', etc.).
     """
     original_pos = csv_file.tell()
-    content = csv_file.read(1024).decode('utf-8')
+    content = csv_file.read(1024)
+    if type(content) != str:
+        content = content.decode('utf-8')
     dialect = csv.Sniffer().sniff(content)
     csv_file.seek(original_pos)
     return dialect.delimiter
