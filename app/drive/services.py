@@ -162,6 +162,7 @@ def get_data_from_csv(
         parent_id=output_folder_id
     )
     data = None
+    metadata = None
     if data_file_id:    
         file = download_file(credentials, data_file_id)
         df = pd.read_csv(file)
@@ -171,5 +172,7 @@ def get_data_from_csv(
         # Replace nan values
         df = df.fillna("")
         data  = df.to_dict(orient='records')
-        
-    return data
+        metadata = df.dtypes.apply(lambda x: x.name).to_dict()
+        print(metadata)
+
+    return data, metadata

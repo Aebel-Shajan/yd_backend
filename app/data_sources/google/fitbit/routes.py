@@ -14,13 +14,20 @@ async def get_fitbit_calories_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data = get_data_from_csv(
+    data, metadata = get_data_from_csv(
         credentials,
         csv_name="fitbit_calories.csv",
-        year=year,
+        year=year
     )
+    
     if data:
-        return {"status": "success", "data": data}
+        return {
+            "status": "success",
+            "data": data,
+            "metadata": metadata
+        }
+    
+
 
     raise HTTPException(400, detail="Data file for data source not found!")
 
@@ -30,13 +37,20 @@ async def get_fitbit_steps_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data = get_data_from_csv(
+    data, metadata  = get_data_from_csv(
         credentials,
         csv_name="fitbit_steps.csv",
-        year=year,
+        year=year
     )
+    
     if data:
-        return {"status": "success", "data": data}
+        return {
+            "status": "success",
+            "data": data,
+            "metadata": metadata
+        }
+    
+
 
     raise HTTPException(400, detail="Data file for data source not found!")
 
@@ -46,13 +60,20 @@ async def get_fitbit_sleep_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data = get_data_from_csv(
+    data, metadata = get_data_from_csv(
         credentials,
         csv_name="fitbit_sleep.csv",
-        year=year,
+        year=year
     )
+    
     if data:
-        return {"status": "success", "data": data}
+        return {
+            "status": "success",
+            "data": data,
+            "metadata": metadata
+        }
+    
+
 
     raise HTTPException(400, detail="Data file for data source not found!")
 
@@ -62,12 +83,18 @@ async def get_fitbit_exercises_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data = get_data_from_csv(
+    data, metadata =get_data_from_csv(
         credentials,
         csv_name="fitbit_exercises.csv",
-        year=year,
+        year=year
     )
+    
     if data:
-        return {"status": "success", "data": data}
+        return {
+            "status": "success",
+            "data": data,
+            "metadata": metadata
+        }
+    
 
     raise HTTPException(400, detail="Data file for data source not found!")

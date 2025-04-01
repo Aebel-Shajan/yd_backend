@@ -45,7 +45,7 @@ async def get_strong_workouts(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data = get_data_from_csv(
+    data, metadata =get_data_from_csv(
         credentials,
         csv_name="strong_workouts.csv",
         year=year
@@ -54,7 +54,8 @@ async def get_strong_workouts(
     if data:
         return {
             "status": "success",
-            "data": data
+            "data": data,
+            "metadata": metadata
         }
     
     raise HTTPException(400, detail="Data file for strong data source not found!")
