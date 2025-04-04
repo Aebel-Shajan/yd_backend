@@ -4,7 +4,8 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import pandas as pd
-
+import gspread
+from gspread_dataframe import set_with_dataframe
 
 def get_user_info(credentials: Credentials):
     service = build("oauth2", "v2", credentials=credentials)
@@ -176,3 +177,66 @@ def get_data_from_csv(
         print(metadata)
 
     return data, metadata
+
+def create_or_overwrite_sheet(
+    credentials: Credentials,
+    df: pd.DataFrame,
+    worksheet_name: str,
+    file_name: str,
+    parent_id: str
+):
+    service = build("drive", "v3", credentials=credentials)
+    existing_file_id = query_drive_file(credentials, file_name, parent_id)
+    
+    file_metadata = {
+        'name': file_name,
+        'mimeType': 'application/vnd.google-apps.spreadsheet',
+        'parents': [parent_id]
+    }
+    file_id = existing_file_id
+    if not existing_file_id:
+        uploaded = service.files().create(
+            body=file_metadata,
+            fields='id'
+        ).execute()
+        print(f"🆕 Uploaded new file ID: {uploaded['id']}")
+        file_id = uploaded['id']
+    else:
+        print(f"✅ Overwritten file ID: {existing_file_id}")
+
+    write_df_to_sheet(
+        credentials,
+        df,
+        spreadsheet_id=file_id,
+        worksheet_name=worksheet_name
+    )
+
+
+def write_df_to_sheet(
+    credentials: Credentials,
+    df: pd.DataFrame, 
+    spreadsheet_id: str, 
+    worksheet_name: str, 
+):
+    """
+    Creates a new Google Spreadsheet using Drive API and writes a DataFrame to it.
+
+    Parameters:
+        df (pd.DataFrame): Data to write.
+        new_title (str): Title of the new Google Sheet.
+        worksheet_name (str): Name of the worksheet/tab.
+        creds_path (str): Path to service account credentials JSON.
+    """
+
+    # --- Step 2: Open and Write to It with gspread ---
+    gc = gspread.authorize(credentials)
+    sh = gc.open_by_key(spreadsheet_id)
+
+    try:
+        worksheet = sh.worksheet(worksheet_name)
+    except gspread.exceptions.WorksheetNotFound:
+        worksheet = sh.add_worksheet(title=worksheet_name, rows="100", cols="20")
+        sh.del_worksheet(sh.sheet1)  # Optionally delete default "Sheet1"
+
+    worksheet.clear()
+    set_with_dataframe(worksheet, df)
