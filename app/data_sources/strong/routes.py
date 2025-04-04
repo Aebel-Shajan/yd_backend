@@ -1,3 +1,5 @@
+from datetime import datetime
+import time
 from fastapi import APIRouter, Depends, UploadFile, HTTPException
 from google.oauth2.credentials import Credentials
 import pandas as pd
@@ -5,6 +7,7 @@ from app.auth.services import get_current_user_credentials
 from app.drive.services import (
     create_or_overwrite_sheet,
     get_data_from_csv,
+    get_records_from_sheet,
     query_or_create_nested_folder,
     upload_or_overwrite,
     download_file,
@@ -39,24 +42,39 @@ async def upload_strong_data(
         "status": "success",
         "message": "Successfully uploaded and processed strong data."
     }
-    
+
+
+def filter_year(row: dict, year: int):
+    dt = datetime.strptime(row["date"], '%Y-%m-%d %H:%M:%S')
+    return dt.year == year
     
 @router.get("/workouts/{year}")
 async def get_strong_workouts(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data, metadata =get_data_from_csv(
+    start_time = time.time()
+    output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
+            
+    data =get_records_from_sheet(
         credentials,
-        csv_name="strong_workouts.csv",
-        year=year
+        worksheet_name="strong_workouts",
+        file_name="year_in_data",
+        parent_id=output_folder_id,
+        filter_function=lambda row: filter_year(row, year)
     )
+    end_time = time.time()
+
+    # Calculate elapsed time
+    elapsed_time = end_time - start_time
+
     
     if data:
         return {
             "status": "success",
             "data": data,
-            "metadata": metadata
+            "metadata": {},
+            "elapsed_time": f"{elapsed_time} seconds"
         }
     
     raise HTTPException(400, detail="Data file for strong data source not found!")
