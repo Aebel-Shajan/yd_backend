@@ -3,6 +3,7 @@ from google.oauth2.credentials import Credentials
 import pandas as pd
 from app.auth.services import get_current_user_credentials
 from app.drive.services import (
+    create_or_overwrite_sheet,
     get_data_from_csv,
     query_or_create_nested_folder,
     upload_or_overwrite,
@@ -22,17 +23,17 @@ async def upload_strong_data(
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
     output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
-    save_path = Config.UPLOAD_FOLDER + "strong_workouts.csv"
+    # save_path = Config.UPLOAD_FOLDER + "strong_workouts.csv"
     with file.file as csv_file:
         df = strong.process_workouts(csv_file)
-        df.to_csv(save_path, index=False)
-        upload_or_overwrite(
-            credentials=credentials, 
-            file_path=save_path, 
-            file_name="strong_workouts.csv",
+        create_or_overwrite_sheet(
+            credentials=credentials,
+            df = df,
+            worksheet_name="strong_workouts",
+            file_name="year_in_data",
             parent_id=output_folder_id
         )
-    os.remove(save_path)
+    # os.remove(save_path)
     
     return {
         "status": "success",
