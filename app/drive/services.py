@@ -240,3 +240,28 @@ def write_df_to_sheet(
 
     worksheet.clear()
     set_with_dataframe(worksheet, df)
+
+
+def get_records_from_sheet(
+    credentials: Credentials,
+    worksheet_name: str,
+    file_name: str,
+    parent_id: str,
+    filter_function=None
+) -> dict[str, any]:
+    existing_file_id = query_drive_file(credentials, file_name, parent_id)
+    if existing_file_id is None:
+        raise ValueError("Sheet with file_name={file_name} could not be found in drive!")
+    
+    gc = gspread.authorize(credentials)
+    sh = gc.open_by_key(existing_file_id)
+    worksheet = sh.worksheet(worksheet_name)
+
+    # Get all data
+    data = worksheet.get_all_records()
+    
+    if filter_function:
+        print(data[0].keys())
+        data = list(filter(filter_function, data))
+        
+    return data
