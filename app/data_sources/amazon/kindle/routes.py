@@ -6,7 +6,7 @@ from google.oauth2.credentials import Credentials
 from app.auth.services import get_current_user_credentials
 from app.config import Config
 from app.data_sources.services import check_folder_exists_in_zip
-from app.drive.services import create_or_update_sheet, get_records_from_sheet, query_or_create_nested_folder
+from app.drive.services import create_or_update_sheet, get_data_from_sheet, query_or_create_nested_folder
 from yd_extractor import kindle
 
 
@@ -69,7 +69,7 @@ async def get_kindle_reading(
 ):
     output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
             
-    data, metadata =get_records_from_sheet(
+    data, metadata =get_data_from_sheet(
         credentials,
         worksheet_name="kindle_reading",
         file_name="year_in_data",

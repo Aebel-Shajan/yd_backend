@@ -241,7 +241,7 @@ def write_df_to_sheet(
     set_with_dataframe(worksheet, df)
 
 
-def get_records_from_sheet(
+def get_data_from_sheet(
     credentials: Credentials,
     worksheet_name: str,
     file_name: str,
