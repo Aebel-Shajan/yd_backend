@@ -250,7 +250,7 @@ def get_data_from_sheet(
 ) -> tuple[dict, dict]:
     existing_file_id = query_drive_file(credentials, file_name, parent_id)
     if existing_file_id is None:
-        raise ValueError("Sheet with file_name={file_name} could not be found in drive!")
+        raise ValueError(f"Sheet with file_name={file_name} could not be found in drive!")
     
     gc = gspread.authorize(credentials)
     sh = gc.open_by_key(existing_file_id)
