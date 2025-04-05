@@ -47,7 +47,7 @@ async def upload_google_takeout_data(
         create_or_update_sheet(
             credentials,
             df=df,
-            worksheet_name="fibit_calories",
+            worksheet_name="fitbit_calories",
             file_name="year_in_data",
             parent_id=output_folder_id
         )
