@@ -3,8 +3,9 @@ import time
 from fastapi import APIRouter, Depends, UploadFile, HTTPException
 from google.oauth2.credentials import Credentials
 import pandas as pd
+from sqlalchemy import Table
 from app.auth.services import get_current_user_credentials
-from app.data_sources.services import upload_df_to_table
+from app.data_sources.services import get_data_from_table, upload_df_to_table
 from app.database import SessionLocal
 from app.drive.services import (
     create_or_update_sheet,
@@ -41,28 +42,22 @@ async def upload_strong_data(file: UploadFile):
                 )
             }
 
-    
+
 @router.get("/workouts/{year}")
-async def get_strong_workouts(
-    year: int,
-    credentials: Credentials = Depends(get_current_user_credentials),
-):
-    output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
-            
-    data, metadata =get_data_from_sheet(
-        credentials,
-        worksheet_name="strong_workouts",
-        file_name="year_in_data",
-        parent_id=output_folder_id,
-        year=year
-    )
-    
-    if data:
-        return {
-            "status": "success",
-            "data": data,
-            "metadata": metadata
-        }
-    
+async def get_strong_workouts(year: int):
+    with SessionLocal() as db:        
+        data, metadata =get_data_from_table(
+            model=StrongWorkout,
+            db=db,
+            year=year
+        )
+        
+        if data:
+            return {
+                "status": "success",
+                "data": data,
+                "metadata": metadata
+            }
+        
     raise HTTPException(400, detail="Data file for strong data source not found!")
         
