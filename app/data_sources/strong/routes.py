@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, UploadFile, HTTPException
 from google.oauth2.credentials import Credentials
 import pandas as pd
 from app.auth.services import get_current_user_credentials
+from app.data_sources.services import upload_df_to_table
+from app.database import SessionLocal
 from app.drive.services import (
     create_or_update_sheet,
     get_data_from_csv,
@@ -15,33 +17,29 @@ from app.drive.services import (
 )
 from yd_extractor import strong
 from app.config import Config
+from app.data_sources.strong.models import StrongWorkout
 import os
 
 router = APIRouter(prefix="/strong")
 
 
 @router.post("/upload-data")
-async def upload_strong_data(
-    file: UploadFile,
-    credentials: Credentials = Depends(get_current_user_credentials),
-):
-    output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
-    # save_path = Config.UPLOAD_FOLDER + "strong_workouts.csv"
+async def upload_strong_data(file: UploadFile):
     with file.file as csv_file:
         df = strong.process_workouts(csv_file)
-        create_or_update_sheet(
-            credentials=credentials,
-            df = df,
-            worksheet_name="strong_workouts",
-            file_name="year_in_data",
-            parent_id=output_folder_id
-        )
-    # os.remove(save_path)
-    
-    return {
-        "status": "success",
-        "message": "Successfully uploaded and processed strong data."
-    }
+        with SessionLocal() as db:
+            added_rows, duplicate_rows = upload_df_to_table(
+                df,
+                model=StrongWorkout,
+                db=db
+            )
+            return {
+                "status": "success",
+                "message": (
+                    f"Successfully added {added_rows} rows. "
+                    f"Found {duplicate_rows} duplicate rows."
+                )
+            }
 
     
 @router.get("/workouts/{year}")
@@ -58,8 +56,6 @@ async def get_strong_workouts(
         parent_id=output_folder_id,
         year=year
     )
-
-
     
     if data:
         return {
