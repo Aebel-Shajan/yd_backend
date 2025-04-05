@@ -1,9 +1,11 @@
 import math
+from typing import Optional
 import zipfile
-from sqlalchemy import and_, insert, inspect, null, select
+from sqlalchemy import and_, extract, insert, inspect, null, select
 from sqlalchemy.orm import Session
 import pandas as pd
 
+from app.data_sources.strong.models import StrongWorkout
 
 def check_folder_exists_in_zip(zip_path: str, nested_folder_path: str):
     """
@@ -30,6 +32,26 @@ def check_folder_exists_in_zip(zip_path: str, nested_folder_path: str):
     except zipfile.BadZipFile:
         return False #File is not a zip file or is corrupted
     
+    
+def get_data_from_table(
+    model: StrongWorkout,
+    db: Session,
+    year: Optional[int]=None
+) -> list[dict]:
+    data = db.query(model)
+    if year:
+        data = db.query(model).filter(extract("year", getattr(model, "date")) == year)
+    data = data.all()
+    # Creating a list of dictionaries with column name, type, and comment
+    metadata = [
+        {
+            "name": column.name,
+            "type": str(column.type),  # str() is used to convert type to string representation
+            "comment": column.comment
+        }
+        for column in model.__table__.columns 
+    ]
+    return data, metadata
     
 def upload_df_to_table(
     df: pd.DataFrame,
