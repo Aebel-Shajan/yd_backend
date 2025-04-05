@@ -6,7 +6,7 @@ from google.oauth2.credentials import Credentials
 from app.auth.services import get_current_user_credentials
 from app.config import Config
 from app.data_sources.services import check_folder_exists_in_zip
-from app.drive.services import query_or_create_nested_folder, upload_or_overwrite
+from app.drive.services import create_or_update_sheet, get_records_from_sheet, query_or_create_nested_folder
 from yd_extractor import kindle
 
 
@@ -45,15 +45,13 @@ async def upload_kindle_zip_file(
             inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
             zip_path=zip_file_path
         )
-        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "kindle_reading.csv"
-        df.to_csv(save_path, index=False)
-        upload_or_overwrite(
-            credentials=credentials, 
-            file_path=save_path, 
-            file_name="kindle_reading.csv",
+        create_or_update_sheet(
+            credentials=credentials,
+            df = df,
+            worksheet_name="kindle_reading",
+            file_name="year_in_data",
             parent_id=output_folder_id
         )
-        os.remove(save_path)
     
     os.remove(zip_file_path)
     return {
@@ -63,4 +61,28 @@ async def upload_kindle_zip_file(
             "uploaded_sources": uploaded_sources
         }
     }
+
+@router.get("/reading/{year}")
+async def get_kindle_reading(
+    year: int,
+    credentials: Credentials = Depends(get_current_user_credentials),
+):
+    output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
+            
+    data, metadata =get_records_from_sheet(
+        credentials,
+        worksheet_name="kindle_reading",
+        file_name="year_in_data",
+        parent_id=output_folder_id,
+        year=year
+    )
+
+    if data:
+        return {
+            "status": "success",
+            "data": data,
+            "metadata": metadata
+        }
     
+    raise HTTPException(400, detail="Data file for strong data source not found!")
+        
