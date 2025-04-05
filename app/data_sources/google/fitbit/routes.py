@@ -40,7 +40,7 @@ async def get_fitbit_steps_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data")
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
     data, metadata = get_data_from_sheet(
         credentials=credentials,
         worksheet_name="fitbit_steps",
@@ -66,7 +66,7 @@ async def get_fitbit_sleep_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data")
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
     
     data, metadata = get_data_from_sheet(
         credentials=credentials,
@@ -93,7 +93,8 @@ async def get_fitbit_exercises_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data")
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
+    
     data, metadata = get_data_from_sheet(
         credentials=credentials,
         worksheet_name="fitbit_exercises",
