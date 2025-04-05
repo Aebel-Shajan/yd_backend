@@ -247,7 +247,7 @@ def get_records_from_sheet(
     worksheet_name: str,
     file_name: str,
     parent_id: str,
-    filter_function=None
+    year: Optional[int] = None
 ) -> tuple[dict, dict]:
     existing_file_id = query_drive_file(credentials, file_name, parent_id)
     if existing_file_id is None:
@@ -260,12 +260,11 @@ def get_records_from_sheet(
     # Get all data
     data = worksheet.get_all_records()
     
-    if filter_function:
-        print(data[0].keys())
-        data = list(filter(filter_function, data))
-    
     df = pd.DataFrame(data)
     df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    if year:
+        df = df[df['date'].dt.year == year]
+    
     # Replace nan values
     df = df.fillna("")
     data  = df.to_dict(orient='records')

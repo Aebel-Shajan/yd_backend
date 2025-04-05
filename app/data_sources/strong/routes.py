@@ -43,10 +43,6 @@ async def upload_strong_data(
         "message": "Successfully uploaded and processed strong data."
     }
 
-
-def filter_year(row: dict, year: int):
-    dt = datetime.strptime(row["date"], '%Y-%m-%d %H:%M:%S')
-    return dt.year == year
     
 @router.get("/workouts/{year}")
 async def get_strong_workouts(
@@ -60,7 +56,7 @@ async def get_strong_workouts(
         worksheet_name="strong_workouts",
         file_name="year_in_data",
         parent_id=output_folder_id,
-        filter_function=lambda row: filter_year(row, year)
+        year=year
     )
 
 
