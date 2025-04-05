@@ -53,28 +53,23 @@ async def get_strong_workouts(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    start_time = time.time()
     output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
             
-    data =get_records_from_sheet(
+    data, metadata =get_records_from_sheet(
         credentials,
         worksheet_name="strong_workouts",
         file_name="year_in_data",
         parent_id=output_folder_id,
         filter_function=lambda row: filter_year(row, year)
     )
-    end_time = time.time()
 
-    # Calculate elapsed time
-    elapsed_time = end_time - start_time
 
     
     if data:
         return {
             "status": "success",
             "data": data,
-            "metadata": {},
-            "elapsed_time": f"{elapsed_time} seconds"
+            "metadata": metadata
         }
     
     raise HTTPException(400, detail="Data file for strong data source not found!")

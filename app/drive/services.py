@@ -248,7 +248,7 @@ def get_records_from_sheet(
     file_name: str,
     parent_id: str,
     filter_function=None
-) -> dict[str, any]:
+) -> tuple[dict, dict]:
     existing_file_id = query_drive_file(credentials, file_name, parent_id)
     if existing_file_id is None:
         raise ValueError("Sheet with file_name={file_name} could not be found in drive!")
@@ -263,5 +263,11 @@ def get_records_from_sheet(
     if filter_function:
         print(data[0].keys())
         data = list(filter(filter_function, data))
-        
-    return data
+    
+    df = pd.DataFrame(data)
+    df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    # Replace nan values
+    df = df.fillna("")
+    data  = df.to_dict(orient='records')
+    metadata = df.dtypes.apply(lambda x: x.name).to_dict()
+    return data, metadata
