@@ -3,7 +3,7 @@ from httplib2 import Credentials
 import pandas as pd
 
 from app.auth.services import get_current_user_credentials
-from app.drive.services import get_data_from_csv
+from app.drive.services import get_data_from_csv, get_data_from_sheet, query_or_create_nested_folder
 
 
 router = APIRouter(prefix="/fitbit")
@@ -14,9 +14,12 @@ async def get_fitbit_calories_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data, metadata = get_data_from_csv(
-        credentials,
-        csv_name="fitbit_calories.csv",
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
+    data, metadata = get_data_from_sheet(
+        credentials=credentials,
+        worksheet_name="fitbit_calories",
+        file_name="year_in_data",
+        parent_id=outputs_folder_id,
         year=year
     )
     
@@ -37,10 +40,13 @@ async def get_fitbit_steps_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data, metadata  = get_data_from_csv(
-        credentials,
-        csv_name="fitbit_steps.csv",
-        year=year
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data")
+    data, metadata = get_data_from_sheet(
+        credentials=credentials,
+        worksheet_name="fitbit_steps",
+        file_name="year_in_data",
+        parent_id=outputs_folder_id,
+        year=year,
     )
     
     if data:
@@ -60,9 +66,13 @@ async def get_fitbit_sleep_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data, metadata = get_data_from_csv(
-        credentials,
-        csv_name="fitbit_sleep.csv",
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data")
+    
+    data, metadata = get_data_from_sheet(
+        credentials=credentials,
+        worksheet_name="fitbit_sleep",
+        file_name="year_in_data",
+        parent_id=outputs_folder_id,
         year=year
     )
     
@@ -83,9 +93,12 @@ async def get_fitbit_exercises_data(
     year: int,
     credentials: Credentials = Depends(get_current_user_credentials),
 ):
-    data, metadata =get_data_from_csv(
-        credentials,
-        csv_name="fitbit_exercises.csv",
+    outputs_folder_id = query_or_create_nested_folder(credentials, "year-in-data")
+    data, metadata = get_data_from_sheet(
+        credentials=credentials,
+        worksheet_name="fitbit_exercises",
+        file_name="year_in_data",
+        parent_id=outputs_folder_id,
         year=year
     )
     
