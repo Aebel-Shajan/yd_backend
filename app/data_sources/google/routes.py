@@ -6,7 +6,7 @@ from google.oauth2.credentials import Credentials
 
 from app.auth.services import get_current_user_credentials
 from app.data_sources.services import check_folder_exists_in_zip
-from app.drive.services import query_or_create_nested_folder, upload_or_overwrite
+from app.drive.services import create_or_update_sheet, query_or_create_nested_folder, upload_or_overwrite
 from app.config import Config
 from yd_extractor import fitbit
 from app.data_sources.google.fitbit.routes import router as fitbit_router
@@ -44,60 +44,52 @@ async def upload_google_takeout_data(
             inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
             zip_path=zip_file_path
         )
-        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_calories.csv"
-        df.to_csv(save_path, index=False)
-        upload_or_overwrite(
-            credentials=credentials, 
-            file_path=save_path, 
-            file_name="fitbit_calories.csv",
+        create_or_update_sheet(
+            credentials,
+            df=df,
+            worksheet_name="fibit_calories",
+            file_name="year_in_data",
             parent_id=output_folder_id
         )
-        os.remove(save_path)
         
         # Sleep
         df = fitbit.process_sleep(
             inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
             zip_path=zip_file_path
         )
-        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_sleep.csv"
-        df.to_csv(save_path, index=False)
-        upload_or_overwrite(
-            credentials=credentials, 
-            file_path=save_path, 
-            file_name="fitbit_sleep.csv",
+        create_or_update_sheet(
+            credentials,
+            df=df,
+            worksheet_name="fitbit_sleep",
+            file_name="year_in_data",
             parent_id=output_folder_id
         )
-        os.remove(save_path)
         
         # Exercises
         df = fitbit.process_exercise(
             inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
             zip_path=zip_file_path
         )
-        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_exercises.csv"
-        df.to_csv(save_path, index=False)
-        upload_or_overwrite(
-            credentials=credentials, 
-            file_path=save_path, 
-            file_name="fitbit_exercises.csv",
+        create_or_update_sheet(
+            credentials,
+            df=df,
+            worksheet_name="fitbit_exercises",
+            file_name="year_in_data",
             parent_id=output_folder_id
         )
-        os.remove(save_path)
         
         # Steps
         df = fitbit.process_steps(
             inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
             zip_path=zip_file_path
         )
-        save_path = pathlib.Path(Config.UPLOAD_FOLDER) / "fitbit_steps.csv"
-        df.to_csv(save_path, index=False)
-        upload_or_overwrite(
-            credentials=credentials, 
-            file_path=save_path, 
-            file_name="fitbit_steps.csv",
+        create_or_update_sheet(
+            credentials,
+            df=df,
+            worksheet_name="fitbit_steps",
+            file_name="year_in_data",
             parent_id=output_folder_id
         )
-        os.remove(save_path)
         
     
     # Youtube
