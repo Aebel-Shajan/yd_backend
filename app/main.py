@@ -8,7 +8,7 @@ from app.config import Config
 from app.auth.routes import router as auth_router
 from app.drive.routes import router as drive_router
 from app.data_sources.routes import router as data_source_router
-from app.database import Base, engine
+from app.database.session import Base, engine
 
 Base.metadata.create_all(bind=engine)
 

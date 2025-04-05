@@ -1,25 +1,8 @@
-from datetime import datetime
-import time
-from fastapi import APIRouter, Depends, UploadFile, HTTPException
-from google.oauth2.credentials import Credentials
-import pandas as pd
-from sqlalchemy import Table
-from app.auth.services import get_current_user_credentials
+from fastapi import APIRouter, UploadFile, HTTPException
 from app.data_sources.services import get_data_from_table, upload_df_to_table
-from app.database import SessionLocal
-from app.drive.services import (
-    create_or_update_sheet,
-    get_data_from_csv,
-    get_data_from_sheet,
-    query_or_create_nested_folder,
-    upload_or_overwrite,
-    download_file,
-    query_drive_file
-)
+from app.database.session import SessionLocal
 from yd_extractor import strong
-from app.config import Config
 from app.data_sources.strong.models import StrongWorkout
-import os
 
 router = APIRouter(prefix="/strong")
 

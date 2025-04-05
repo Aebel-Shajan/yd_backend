@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Date, Float, Integer, String
-from app.database import Base
+from app.database.base import Base
 
 
 class StrongWorkout(Base):
