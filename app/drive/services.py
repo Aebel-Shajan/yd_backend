@@ -178,7 +178,7 @@ def get_data_from_csv(
 
     return data, metadata
 
-def create_or_overwrite_sheet(
+def create_or_update_sheet(
     credentials: Credentials,
     df: pd.DataFrame,
     worksheet_name: str,
@@ -199,10 +199,10 @@ def create_or_overwrite_sheet(
             body=file_metadata,
             fields='id'
         ).execute()
-        print(f"🆕 Uploaded new file ID: {uploaded['id']}")
+        print(f"🆕 Uploaded new sheet ID: {uploaded['id']}")
         file_id = uploaded['id']
     else:
-        print(f"✅ Overwritten file ID: {existing_file_id}")
+        print(f"✅ Updating existing sheet ID: {existing_file_id}")
 
     write_df_to_sheet(
         credentials,
@@ -236,7 +236,6 @@ def write_df_to_sheet(
         worksheet = sh.worksheet(worksheet_name)
     except gspread.exceptions.WorksheetNotFound:
         worksheet = sh.add_worksheet(title=worksheet_name, rows="100", cols="20")
-        sh.del_worksheet(sh.sheet1)  # Optionally delete default "Sheet1"
 
     worksheet.clear()
     set_with_dataframe(worksheet, df)

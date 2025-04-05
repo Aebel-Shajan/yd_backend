@@ -5,7 +5,7 @@ from google.oauth2.credentials import Credentials
 import pandas as pd
 from app.auth.services import get_current_user_credentials
 from app.drive.services import (
-    create_or_overwrite_sheet,
+    create_or_update_sheet,
     get_data_from_csv,
     get_records_from_sheet,
     query_or_create_nested_folder,
@@ -29,7 +29,7 @@ async def upload_strong_data(
     # save_path = Config.UPLOAD_FOLDER + "strong_workouts.csv"
     with file.file as csv_file:
         df = strong.process_workouts(csv_file)
-        create_or_overwrite_sheet(
+        create_or_update_sheet(
             credentials=credentials,
             df = df,
             worksheet_name="strong_workouts",
