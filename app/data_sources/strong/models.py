@@ -6,14 +6,14 @@ class StrongWorkout(Base):
     __tablename__="strong_workouts"
     
 
-    id = Column(Integer, primary_key=True, index=True)
-    date = Column(Date, nullable=False)
-    workout_name = Column(String, nullable=False)
-    exercise_name = Column(String, nullable=False)
-    total_sets = Column(Integer, nullable=False)
-    max_weight= Column(Float, nullable=True)
-    total_reps= Column(Integer, nullable=False)
-    total_volume = Column(Float, nullable=False)
-    workout_duration_minutes= Column(Integer, nullable=False)
-    distance = Column(Integer, nullable=False)
+    id = Column(Integer, primary_key=True, index=True, comment="primary_key")
+    date = Column(Date, nullable=False, comment="date_column")
+    workout_name = Column(String, nullable=False, comment="category_column")
+    exercise_name = Column(String, nullable=False, comment="category_column")
+    total_sets = Column(Integer, nullable=False, comment="value_column")
+    max_weight= Column(Float, nullable=True, comment="value_column max")
+    total_reps= Column(Integer, nullable=False, comment="value_column")
+    total_volume = Column(Float, nullable=False, comment="value_column")
+    workout_duration_minutes= Column(Integer, nullable=False, comment="value_column max")
+    distance = Column(Integer, nullable=False, comment="value_column")
     
