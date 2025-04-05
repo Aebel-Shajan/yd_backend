@@ -1,5 +1,7 @@
+import logging
 import os
-from fastapi import FastAPI
+import time
+from fastapi import FastAPI, Request
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import Config
@@ -24,6 +26,7 @@ app.add_middleware(
 )
 origins = [
     "http://localhost:5173",
+    "http://localhost:4173"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -32,6 +35,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
+
+@app.middleware("http")
+async def log_request_time(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = (time.time() - start_time) * 1000  # in milliseconds
+    formatted_process_time = f"{process_time:.2f}ms"
+
+    logger.info(f"{request.method} {request.url.path} completed in {formatted_process_time}")
+
+    # You can also add the timing info to the response headers (optional)
+    response.headers["X-Process-Time"] = formatted_process_time
+    return response
+
 app.include_router(auth_router)
 app.include_router(drive_router)
 app.include_router(data_source_router)
