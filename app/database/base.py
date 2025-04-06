@@ -4,3 +4,4 @@ Base = declarative_base()
 
 
 from app.data_sources.strong.models import *
+from app.data_sources.amazon.kindle.models import *
