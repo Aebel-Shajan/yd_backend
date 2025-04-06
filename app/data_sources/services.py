@@ -37,7 +37,7 @@ def get_data_from_table(
     model: StrongWorkout,
     db: Session,
     year: Optional[int]=None
-) -> list[dict]:
+) -> tuple[list, list]:
     data = db.query(model)
     if year:
         data = db.query(model).filter(extract("year", getattr(model, "date")) == year)

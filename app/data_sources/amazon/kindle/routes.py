@@ -6,7 +6,7 @@ from google.oauth2.credentials import Credentials
 from app.auth.services import get_current_user_credentials
 from app.config import Config
 from app.data_sources.amazon.kindle.models import KindleReading
-from app.data_sources.services import check_folder_exists_in_zip, upload_df_to_table
+from app.data_sources.services import check_folder_exists_in_zip, upload_df_to_table, get_data_from_table
 from app.database.session import SessionLocal
 from app.drive.services import get_data_from_sheet, query_or_create_nested_folder
 from yd_extractor import kindle
@@ -76,26 +76,19 @@ async def upload_kindle_zip_file(file: UploadFile):
     }
 
 @router.get("/reading/{year}")
-async def get_kindle_reading(
-    year: int,
-    credentials: Credentials = Depends(get_current_user_credentials),
-):
-    output_folder_id = query_or_create_nested_folder(credentials, "year-in-data/outputs")
-            
-    data, metadata =get_data_from_sheet(
-        credentials,
-        worksheet_name="kindle_reading",
-        file_name="year_in_data",
-        parent_id=output_folder_id,
-        year=year
-    )
-
-    if data:
-        return {
-            "status": "success",
-            "data": data,
-            "metadata": metadata
-        }
+async def get_kindle_reading(year: int):
+    with SessionLocal() as db:
+        data, metadata = get_data_from_table(
+            model=KindleReading,
+            db=db,
+            year=year
+        )
+        if data:
+            return {
+                "status": "success",
+                "data": data,
+                "metadata": metadata
+            }
     
     raise HTTPException(400, detail="Data file for strong data source not found!")
         
