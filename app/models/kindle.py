@@ -10,6 +10,6 @@ class KindleReading(Base):
     date = Column(Date, nullable=False, comment="date_column")
     start_time = Column(Time, nullable=False, comment="time_column")
     asin = Column(String, nullable=False, comment="category_column")
-    total_reading_minutes = Column(Integer, nullable=False, comment="value_column")
+    total_reading_minutes = Column(Integer, nullable=False, comment="value_column [minutes]")
     # image = Column(String, nullable=False, comment="image_column")
     
