@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table('kindle_reading',
     sa.Column('id', sa.Integer(), nullable=False, comment='primary_key'),
     sa.Column('date', sa.Date(), nullable=False, comment='date_column'),
-    sa.Column('start_time', sa.TIMESTAMP(), nullable=False, comment='time_column'),
+    sa.Column('start_time', sa.Time(), nullable=False, comment='time_column'),
     sa.Column('asin', sa.String(), nullable=False, comment='category_column'),
     sa.Column('total_reading_minutes', sa.Integer(), nullable=False, comment='value_column'),
     sa.PrimaryKeyConstraint('id')
