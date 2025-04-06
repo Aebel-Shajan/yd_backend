@@ -1,28 +1,34 @@
-from typing_extensions import Literal
+
+
+from typing import Literal
 from fastapi import APIRouter, HTTPException
 from app.database.session import SessionLocal
-from app.data_sources.services import get_data_from_table
-from app.data_sources.google.fitbit.models import (
+from app.models.fibit import (
     FitbitCalories,
     FitbitExercise,
     FitbitSleep,
     FitbitSteps
 )
+from app.models.kindle import KindleReading
+from app.models.strong import StrongWorkout
+from app.services.retrieve_data import get_data_from_table, pascal_to_snake
+
+router = APIRouter(prefix="/retrieve_data")
 
 
-router = APIRouter(prefix="/fitbit")
-
-ROUTE_MAP = {
-    "calories":    FitbitCalories, 
-    "steps":    FitbitSteps,
-    "sleep":     FitbitSleep,
-    "exercises" :   FitbitExercise,
-}
-routes = list(ROUTE_MAP.keys())
+models = [
+    FitbitCalories,
+    FitbitExercise,
+    FitbitSleep,
+    FitbitSteps,
+    KindleReading,
+    StrongWorkout
+]
+ROUTE_MAP = {pascal_to_snake(model.__name__): model for model in models}
 
 @router.get("/{data_route}/{year}")
 async def get_fitbit_data(
-    data_route: Literal[*routes],
+    data_route: Literal[*ROUTE_MAP.keys()], # type: ignore
     year: int,
 ):
 
@@ -42,9 +48,8 @@ async def get_fitbit_data(
                 "data": data,
                 "metadata": metadata
             }
-    
 
+    raise HTTPException(400, detail="Could not find data for data source!")
 
-    raise HTTPException(400, detail="Data file for data source not found!")
 
 

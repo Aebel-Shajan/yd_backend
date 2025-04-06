@@ -1,0 +1,105 @@
+import math
+from typing import Optional
+from sqlalchemy import and_, extract, null, select
+from sqlalchemy.orm import Session
+from app.models.strong import StrongWorkout
+
+
+def pascal_to_snake(pascal_str):
+    """
+    Convert a PascalCase string to snake_case.
+    
+    Args:
+        pascal_str (str): The PascalCase string to convert
+        
+    Returns:
+        str: The converted snake_case string
+    
+    Examples:
+        >>> pascal_to_snake("HelloWorld")
+        "hello_world"
+        >>> pascal_to_snake("HTTPResponse")
+        "http_response"
+    """
+    if not pascal_str:
+        return ""
+    
+    # Start with the first character in lowercase
+    result = pascal_str[0].lower()
+    
+    # Process the rest of the string
+    for char in pascal_str[1:]:
+        if char.isupper():
+            # Add underscore before uppercase letters
+            result += "_" + char.lower()
+        else:
+            result += char
+            
+    return result
+
+
+    
+def get_data_from_table(
+    model: StrongWorkout,
+    db: Session,
+    year: Optional[int]=None
+) -> tuple[list, list]:
+    data = db.query(model)
+    if year:
+        data = db.query(model).filter(extract("year", getattr(model, "date")) == year)
+    data = data.all()
+    # Creating a list of dictionaries with column name, type, and comment
+    metadata = [
+        {
+            "name": column.name,
+            "type": str(column.type),  # str() is used to convert type to string representation
+            "comment": column.comment
+        }
+        for column in model.__table__.columns 
+    ]
+    return data, metadata
+    
+
+
+def is_duplicate(
+    model,
+    data: dict,
+    db: Session
+) -> bool:
+    """
+    Check if a given data entry already exists in the database.
+
+    Args:
+        session (Session): The SQLModel database session.
+        model (SQLModel): The SQLModel table class to check against.
+        data (dict): A dictionary representing the new data row.
+
+    Returns:
+        bool: True if a duplicate exists, False otherwise.
+    """
+    # Build the filter dynamically using all non-primary key columns
+    filters = []
+    for key, value in data.items():
+        column = getattr(model, key)
+        if is_value_null(value):
+            filters.append(column.is_(null()))  # Handle NULL values properly
+        else:
+            filters.append(column == value)
+        
+
+    if not filters:
+        return False  # No valid filters, cannot check duplicates
+
+    # Run the query to check for existing duplicates
+    statement = select(model).where(and_(*filters))
+    result = db.execute(statement).first() is not None
+    return result
+
+
+def is_value_null(value: any) -> bool:
+    if type(value) in {float, int}:
+        return math.isnan(value)
+    elif type(value) == str:
+        return value == "" 
+    else:
+        return value is None

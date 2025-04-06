@@ -7,7 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import Config
 from app.auth.routes import router as auth_router
 from app.drive.routes import router as drive_router
-from app.data_sources.routes import router as data_source_router
+from app.routes.retrieve_data import router as retrieve_data_router
+from app.routes.upload_data import router as upload_data_router
 from app.database.base import Base
 from app.database.session import engine
 
@@ -55,7 +56,8 @@ async def log_request_time(request: Request, call_next):
 
 app.include_router(auth_router)
 app.include_router(drive_router)
-app.include_router(data_source_router)
+app.include_router(retrieve_data_router)
+app.include_router(upload_data_router)
 
 
 if __name__ == "__main__":
