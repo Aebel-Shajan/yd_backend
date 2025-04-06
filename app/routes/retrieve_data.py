@@ -27,7 +27,7 @@ models = [
 ROUTE_MAP = {pascal_to_snake(model.__name__): model for model in models}
 
 @router.get("/{data_route}/{year}")
-async def get_fitbit_data(
+async def get_data_for_source(
     data_route: Literal[*ROUTE_MAP.keys()], # type: ignore
     year: int,
 ):
@@ -35,21 +35,26 @@ async def get_fitbit_data(
     if data_route not in ROUTE_MAP.keys():
         raise HTTPException(404, "Route not found. Must be one of {allowed_routes}")
     
-    with SessionLocal() as db:
-        data, metadata = get_data_from_table(
-            model=ROUTE_MAP[data_route],
-            db=db,
-            year=year
-        )
+    try:
+        with SessionLocal() as db:
+            data, metadata = get_data_from_table(
+                model=ROUTE_MAP[data_route],
+                db=db,
+                year=year
+            )
 
-        if data:
             return {
                 "status": "success",
                 "data": data,
                 "metadata": metadata
             }
-
-    raise HTTPException(400, detail="Could not find data for data source!")
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while processing the file: {str(e)}"
+        )
 
 
 @router.get("/data-routes")
