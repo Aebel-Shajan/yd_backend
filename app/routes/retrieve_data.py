@@ -13,7 +13,7 @@ from app.models.kindle import KindleReading
 from app.models.strong import StrongWorkout
 from app.services.retrieve_data import get_data_from_table, pascal_to_snake
 
-router = APIRouter(prefix="/retrieve_data")
+router = APIRouter(prefix="/retrieve-data")
 
 
 models = [
@@ -52,4 +52,9 @@ async def get_fitbit_data(
     raise HTTPException(400, detail="Could not find data for data source!")
 
 
-
+@router.get("/data-routes")
+def get_data_routes():
+    return {
+        "status": "success",
+        "data": list(ROUTE_MAP.keys())
+    }
