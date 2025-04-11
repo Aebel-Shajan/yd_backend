@@ -11,7 +11,8 @@ from app.models.fibit import (
 )
 from app.models.kindle import KindleReading
 from app.models.strong import StrongWorkout
-from app.services.retrieve_data import get_data_from_table, pascal_to_snake
+from app.services.retrieve_data import get_data_from_table, get_nth_percentile, get_table_metadata, pascal_to_snake
+from app.services.retrieve_data import get_range_for_table_column
 
 router = APIRouter(prefix="/retrieve-data")
 
@@ -63,3 +64,20 @@ def get_data_routes():
         "status": "success",
         "data": list(ROUTE_MAP.keys())
     }
+    
+@router.get("/{data_route}/range/{column}")
+def get_range_for_table_column_route(
+    data_route: Literal[*ROUTE_MAP.keys()],
+    column: str
+):
+    try:
+        with SessionLocal() as db:
+            model = ROUTE_MAP[data_route]
+            return get_range_for_table_column(model, column,db)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while processing the request: {str(e)}"
+        )

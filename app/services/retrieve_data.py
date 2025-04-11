@@ -1,6 +1,7 @@
 import math
-from typing import Optional
-from sqlalchemy import and_, extract, null, select
+from typing import Optional, TypedDict
+from fastapi import HTTPException
+from sqlalchemy import and_, extract, func, null, select
 from sqlalchemy.orm import Session
 from app.models.strong import StrongWorkout
 import re
@@ -50,6 +51,17 @@ def get_data_from_table(
         data = db.query(model).filter(extract("year", getattr(model, "date")) == year)
     data = data.all()
     # Creating a list of dictionaries with column name, type, and comment
+    metadata = get_table_metadata(model)
+    return data, metadata
+
+
+class ColumnMetadata(TypedDict):
+    name: str
+    type: str
+    units: str
+    classification: str
+    
+def get_table_metadata(model) -> list[ColumnMetadata]:
     metadata = [
         {
             "name": column.name,
@@ -59,9 +71,8 @@ def get_data_from_table(
         }
         for column in model.__table__.columns 
     ]
-    return data, metadata
+    return metadata
     
-
 
 def is_duplicate(
     model,
@@ -140,3 +151,52 @@ def extract_classification_from_comment(comment: str) -> str:
         if classification in comment:
             return classification
     return ""
+
+
+def get_nth_percentile(model, db: Session, column: str, nth_percentile: int):
+    table_column = getattr(model, column)
+    total_count = (
+        db.query(func.count(table_column))
+        .filter(table_column != 0.0)
+        .scalar()
+    )
+    
+    # Calculate the index for the nth percentile (position)
+    nth_position = int(total_count * nth_percentile / 100)
+
+    # Fetch the value at the nth percentile position
+    result = (
+        db.query(table_column)
+        .filter(table_column != 0.0)
+        .order_by(table_column)
+        .offset(nth_position - 1)
+        .limit(1)
+        .scalar()
+    )
+    return result
+
+
+def get_range_for_table_column(
+    model,
+    column: str,
+    db: Session
+):
+    table_metadata = get_table_metadata(model)
+    for column_metadata in table_metadata:
+        if column_metadata["name"] == column:
+            min = get_nth_percentile(model, db, column, 10)
+            max = get_nth_percentile(model, db, column, 90)
+            return get_nice_range(min, max)
+        
+    raise HTTPException(
+        status_code=400, 
+        detail=f"Column provided ({column}) does not exist within table ({model.__tablename__})."
+    ) 
+    
+
+def get_nice_range(min_val: float, max_val:float) -> list[float]:
+    range_diff = max_val - min_val
+    magnitude = 10 ** (len(str(int(range_diff))) - 1)
+    lower_bound = (min_val // magnitude) * magnitude
+    upper_bound = ((max_val // magnitude) + 1) * magnitude
+    return [lower_bound, upper_bound]
