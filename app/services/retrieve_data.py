@@ -3,6 +3,7 @@ from typing import Optional
 from sqlalchemy import and_, extract, null, select
 from sqlalchemy.orm import Session
 from app.models.strong import StrongWorkout
+import re
 
 
 def pascal_to_snake(pascal_str):
@@ -53,7 +54,8 @@ def get_data_from_table(
         {
             "name": column.name,
             "type": str(column.type),  # str() is used to convert type to string representation
-            "comment": column.comment
+            "units": extract_units_from_comment(column.comment),
+            "classification": extract_classification_from_comment(column.comment)
         }
         for column in model.__table__.columns 
     ]
@@ -103,3 +105,38 @@ def is_value_null(value: any) -> bool:
         return value == "" 
     else:
         return value is None
+
+
+def extract_units_from_comment(comment: str) -> str:
+    """
+    Extract the content inside square brackets from a comment string.
+
+    Args:
+        comment (str): The comment string to extract units from.
+
+    Returns:
+        str: The content inside square brackets or "".
+
+    Examples:
+        >>> extract_units_from_comment("value_column [kg]")
+        "kg"
+        >>> extract_units_from_comment("No units here")
+        ""
+    """
+    match = re.search(r"\[(.*?)\]", comment)
+    if match:
+        return match.group(1)
+    return ""
+
+
+def extract_classification_from_comment(comment: str) -> str:
+    column_classifications = [
+        "value_column",
+        "date_column",
+        "category_column"
+    ]
+    
+    for classification in column_classifications:
+        if classification in comment:
+            return classification
+    return ""
