@@ -10,7 +10,7 @@ class FitbitCalories(Base):
 
 
 class FitbitSteps(Base):
-    __tablename__ = "fibit_steps"
+    __tablename__ = "fitbit_steps"
     id = Column(Integer, primary_key=True, index=True, comment="primary_key")
     date = Column(Date, nullable=False, comment="date_column")
     value = Column(Float, nullable=False, comment="value_column [steps]")
