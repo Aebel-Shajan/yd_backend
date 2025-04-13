@@ -11,5 +11,5 @@ class KindleReading(Base):
     start_time = Column(Time, nullable=False, comment="time_column")
     asin = Column(String, nullable=False, comment="category_column")
     total_reading_minutes = Column(Integer, nullable=False, comment="value_column [minutes]")
-    # image = Column(String, nullable=False, comment="image_column")
+    image = Column(String, nullable=True, comment="image_column")
     

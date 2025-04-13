@@ -144,7 +144,8 @@ def extract_classification_from_comment(comment: str) -> str:
     column_classifications = [
         "value_column",
         "date_column",
-        "category_column"
+        "category_column",
+        "image_column"
     ]
     
     for classification in column_classifications:

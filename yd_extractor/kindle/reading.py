@@ -25,7 +25,7 @@ def transform_reading(df: pd.DataFrame) -> pd.DataFrame:
     df = df.rename(columns={"ASIN": "asin"})
     df.loc[:, "date"] = pd.to_datetime(df["start_time"], format="ISO8601").dt.date
     df.loc[:, "start_time"] = pd.to_datetime(df["start_time"], format="ISO8601").dt.time
-    df["book_image"] = df["asin"].apply(get_asin_image)
+    df["image"] = df["asin"].apply(get_asin_image)
     df = df.groupby(["asin", "date"]).aggregate(
         {"start_time": "min", "total_reading_milliseconds": "sum"}
     ).reset_index()
