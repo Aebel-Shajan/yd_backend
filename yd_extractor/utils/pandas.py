@@ -21,8 +21,8 @@ def detect_delimiter(csv_file: BinaryIO) -> str:
     content = csv_file.read(1024)
     if type(content) != str:
         content = content.decode('utf-8')
-    dialect = csv.Sniffer().sniff(content)
     csv_file.seek(original_pos)
+    dialect = csv.Sniffer().sniff(content)
     return dialect.delimiter
 
 
