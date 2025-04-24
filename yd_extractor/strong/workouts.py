@@ -62,13 +62,9 @@ def transform_workouts(df: pd.DataFrame) -> pd.DataFrame:
 
     # Group by for each exercise
     df = (
-        df.groupby(["date", "workout_name", "exercise_name"])
+        df.groupby(["date", "workout_name"])
         .aggregate(
             {
-                "set_order": "max",
-                "weight": "max",
-                "reps": "sum",
-                "distance": "sum",
                 "workout_duration_minutes": "min",
                 "volume": "sum",
             }
@@ -77,12 +73,17 @@ def transform_workouts(df: pd.DataFrame) -> pd.DataFrame:
     )
     df = df.rename(
         columns={
-            "set_order": "total_sets",
-            "weight": "max_weight",
-            "reps": "total_reps",
             "volume": "total_volume"
         }
     )
+    df = df[
+        [
+            "date",
+            "workout_name",
+            "workout_duration_minutes",
+            "total_volume"
+        ]
+    ]
     return df
 
 def process_workouts(csv_file: BinaryIO) -> pd.DataFrame:
