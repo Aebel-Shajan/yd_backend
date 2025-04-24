@@ -12,4 +12,5 @@ class KindleReading(Base):
     asin = Column(String, nullable=False, comment="category_column")
     total_reading_minutes = Column(Integer, nullable=False, comment="value_column [minutes]")
     image = Column(String, nullable=True, comment="image_column")
+    number_of_page_flips = Column(Integer, nullable=False, comment="value_column [pages]")
     
