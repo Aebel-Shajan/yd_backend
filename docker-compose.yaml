@@ -8,3 +8,4 @@ services:
       - ./data:/data
     environment:
       DATABASE_URL: sqlite:////data/year_in_data.db
+    restart: unless-stopped

@@ -8,12 +8,13 @@ from fastapi import APIRouter, HTTPException, UploadFile
 
 from app.config import Config
 from app.database.session import SessionLocal
+import logging
 from app.services.upload_data import (
     read_kindle_data, 
     read_fitbit_data, 
     read_strong_data
 )
-
+logger = logging.getLogger("uvicorn")
 
 router = APIRouter(prefix="/upload-data")
 
@@ -89,24 +90,27 @@ async def upload_amazon_zip_file(file: UploadFile):
 
 @router.post("/google")
 async def upload_google_zip_file(file: UploadFile):
-        
+    logger.info("Uploading zip file...")
     # Validate that uploaded file is a zip
     if not file.filename.endswith(".zip"):
         raise HTTPException(
             status_code=406,
             detail="Uploaded file must be a zip!"
         )
-
+    
     # Save file temporarily to file system
     zip_file_path = pathlib.Path(Config.UPLOAD_FOLDER) / file.filename
     with zip_file_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+        del file
+        logger.info("file copied into file system...")
         
     # initalise uploaded_sources
     uploaded_sources = []
         
     try:
         with SessionLocal() as db:
+            logger.info("Reading data into db...")
             source_info = read_fitbit_data(db, zip_file_path)
             uploaded_sources.append(source_info)
     except HTTPException as e:
