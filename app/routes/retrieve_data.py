@@ -68,9 +68,10 @@ def get_data_routes():
     
 @router.get("/{data_route}/range/{column}")
 def get_range_for_table_column_route(
-    data_route: Literal[*ROUTE_MAP.keys()],
+    data_route: RouteNameEnum,
     column: str
 ):
+    data_route = data_route.value
     try:
         with SessionLocal() as db:
             model = ROUTE_MAP[data_route]
