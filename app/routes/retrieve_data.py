@@ -1,5 +1,4 @@
-
-
+from enum import Enum
 from typing import Literal
 from fastapi import APIRouter, HTTPException
 from app.database.session import SessionLocal
@@ -26,15 +25,17 @@ models = [
     StrongWorkout
 ]
 ROUTE_MAP = {pascal_to_snake(model.__name__): model for model in models}
+route_name_map = {pascal_to_snake(m.__name__): pascal_to_snake(m.__name__) for m in models}
+RouteNameEnum = Enum("RouteName", route_name_map)
 
 @router.get("/{data_route}/{year}")
 async def get_data_for_source(
-    data_route: Literal[*ROUTE_MAP.keys()], # type: ignore
+    data_route: RouteNameEnum,
     year: int,
 ):
-
+    data_route = data_route.value
     if data_route not in ROUTE_MAP.keys():
-        raise HTTPException(404, "Route not found. Must be one of {allowed_routes}")
+        raise HTTPException(404, f"Route not found. Must be one of {ROUTE_MAP.keys()}")
     
     try:
         with SessionLocal() as db:
