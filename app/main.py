@@ -1,4 +1,7 @@
 import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("uvicorn")
+
 import os
 import time
 from fastapi import FastAPI, Request
@@ -38,8 +41,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
+
+
 
 @app.middleware("http")
 async def log_request_time(request: Request, call_next):

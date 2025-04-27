@@ -1,8 +1,10 @@
+import os
 import pathlib
 from typing import BinaryIO
 import zipfile
 
 import pandas as pd
+import psutil
 from sqlalchemy import insert, inspect
 from app.config import Config
 from app.models.kindle import KindleReading
@@ -16,6 +18,9 @@ from app.models.strong import StrongWorkout
 from app.services.retrieve_data import is_duplicate
 from yd_extractor import kindle, fitbit, strong
 from sqlalchemy.orm import Session
+import logging
+
+logger = logging.getLogger()
 
 
 def read_kindle_data(
@@ -61,12 +66,13 @@ def read_fitbit_data(
     
     fitbit_folder =  "Takeout/Fitbit/Global Export Data"
     if check_folder_exists_in_zip(zip_file_path, fitbit_folder):
-        
+        log_memory_usage()
         # Calories
         df = fitbit.process_calories(
             inputs_folder=pathlib.Path(Config.UPLOAD_FOLDER),
             zip_path=zip_file_path
         )
+        log_memory_usage()
         added_rows, duplicate_rows = upload_df_to_table(
             df=df,
             model=FitbitCalories,
@@ -79,6 +85,7 @@ def read_fitbit_data(
                 "duplicate_rows": duplicate_rows
             }
         )
+        log_memory_usage()
         
         # Sleep
         df = fitbit.process_sleep(
@@ -237,3 +244,11 @@ def check_folder_exists_in_zip(zip_path: str, nested_folder_path: str):
     except zipfile.BadZipFile:
         return False #File is not a zip file or is corrupted
     
+    
+
+def log_memory_usage():
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    cpu_info = process.cpu_percent(interval=1)
+    logger.info(f"Memory usage: {memory_info.rss / 1024 / 1024} MB")
+    logger.info(f"CPU usage: {cpu_info}%")

@@ -14,7 +14,7 @@ from app.services.upload_data import (
     read_fitbit_data, 
     read_strong_data
 )
-logger = logging.getLogger("uvicorn")
+logger = logging.getLogger()
 
 router = APIRouter(prefix="/upload-data")
 
