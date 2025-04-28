@@ -249,6 +249,9 @@ def check_folder_exists_in_zip(zip_path: str, nested_folder_path: str):
 def log_memory_usage():
     process = psutil.Process(os.getpid())
     memory_info = process.memory_info()
-    cpu_info = process.cpu_percent(interval=1)
-    logger.info(f"Memory usage: {memory_info.rss / 1024 / 1024} MB")
-    logger.info(f"CPU usage: {cpu_info}%")
+    # Capture CPU usage before and after a short interval to get accurate measurement
+    cpu_percent = process.cpu_percent(interval=None)  # Initialize CPU percent calculation
+    cpu_percent = process.cpu_percent(interval=1.0)  # Measure after 1 second
+
+    logger.info(f"Memory usage: {memory_info.rss / 1024 / 1024:.2f} MB")
+    logger.info(f"CPU usage: {cpu_percent:.2f}%")

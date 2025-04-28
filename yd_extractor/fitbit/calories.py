@@ -25,6 +25,7 @@ def process_calories(
         prefix="Takeout/Fitbit/Global Export Data/calories",
         output_path=data_folder
     )
+    breakpoint()
     logger.info("extracting data from calories json files...")
     df_raw = extract_json_file_data(
         folder_path=data_folder,
