@@ -9,8 +9,5 @@ services:
     environment:
       DATABASE_URL: sqlite:////data/year_in_data.db
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.8'
-          memory: 400M
+    tty: true
+    stdin_open: true 
