@@ -31,7 +31,9 @@ app.add_middleware(
 )
 origins = [
     "http://localhost:5173",
-    "http://localhost:4173"
+    "http://localhost:4173",
+    "https://year-in-data-dpxms9ef6-aebel-shajans-projects.vercel.app", # Testing deployment
+    "https://year-in-data.vercel.app", # production
 ]
 app.add_middleware(
     CORSMiddleware,
