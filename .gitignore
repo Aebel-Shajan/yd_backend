@@ -4,3 +4,5 @@ client_secret.json
 credentials.json
 **.db
 **.DS_Store
+.env
+*data/
